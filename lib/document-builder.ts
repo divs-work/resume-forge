@@ -18,10 +18,7 @@ export function buildResumeDocument(
   const fontUrl = FONT_IMPORTS[mode];
   const fontFamily = FONTS[mode];
 
-  const tailwindScript =
-    mode === "html"
-      ? `<script src="https://cdn.tailwindcss.com"><\/script>`
-      : "";
+  const tailwindScript = `<script src="https://cdn.tailwindcss.com"><\/script>`;
 
   return `<!DOCTYPE html>
 <html>
@@ -59,47 +56,21 @@ ${tailwindScript}
   h2, h3 { page-break-after: avoid; break-after: avoid; }
   ul, ol { page-break-inside: avoid; break-inside: avoid; }
 
-  @media screen {
-    body {
-      ${
-        mode === "html"
-          ? ""
-          : `
-      width: 174mm;
-      margin: 0 auto;
-      padding: 18mm 0;
-      `
-      }
-    }
-  }
-
   @page {
     size: A4;
     margin: 0;
   }
 
   @media print {
-      html, body {
-        ${
-          mode === "html"
-            ? `
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        `
-            : `
-        width: 174mm;
-        margin: 0 auto;
-        padding: 18mm 0;
-        `
-        }
-        background: #fff;
-        overflow: visible;
-      }
-      a { color: inherit !important; }
-    }
+    html, body { width: 100%; margin: 0; padding: 0; background: #fff; overflow: visible; }
+    a { color: inherit !important; }
+  }
 </style>
 </head>
-<body>${body}</body>
+<body>${
+    mode === "html"
+      ? body
+      : `<div style="width:174mm;margin:0 auto;padding:18mm 0">${body}</div>`
+  }</body>
 </html>`;
 }

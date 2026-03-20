@@ -7,11 +7,11 @@ ATS-friendly resume builder with LaTeX, Markdown, and HTML+Tailwind editors — 
 ## Features
 
 - **Three editor modes** — LaTeX, Markdown, and HTML+Tailwind with a default template for each
-- **Live preview** — STIX Two Text for LaTeX, Source Sans 3 for Markdown, DM Sans for HTML; scales to fit any window
-- **ATS Score** — 24 real-time checks across contact info, experience, education, skills, metrics, action verbs, and length
-- **PDF Export** — print-to-PDF via hidden iframe, correct fonts per mode, Tailwind CDN for HTML
+- **Live preview** — STIX Two Text for LaTeX, Source Sans 3 for Markdown, DM Sans + Instrument Serif + JetBrains Mono for HTML; scales to fit any window
+- **ATS Panel** — 56 real-time checks across 8 categories (Contact Info, Sections, Content Quality, Bullet Quality, Keywords, Credentials, Formatting, Length) with score ring, progress bars per category, and hover tooltips on failed checks
+- **PDF Export** — triggers the browser print dialog on the live preview iframe; correct fonts and styles per mode
 - **Persistent** — editor content and active mode survive page refresh via localStorage
-- **Client-side only** — no server rendering, no hydration mismatches
+- **Client-side only** — no server rendering, no hydration mismatches, no backend required
 
 ## Architecture
 
@@ -21,24 +21,24 @@ UI state (`showATS`, `exporting`) lives in component `useState`. Only content an
 app/
 ├── globals.css
 ├── layout.tsx
-└── page.tsx                    # dynamic ssr:false entry point
+└── page.tsx                    # "use client" + dynamic ssr:false entry point
 components/
-├── ResumeBuilder.tsx           # shell, PDF export event handler
+├── ResumeBuilder.tsx           # shell, printTrigger counter, export handler
 ├── Toolbar.tsx                 # mode switcher, ATS toggle, export button
-├── ATSPanel.tsx                # score ring + pass/fail badges
-├── EditorPane.tsx              # textarea with per-mode syntax caret
-└── PreviewPane.tsx             # scaled iframe preview, page break lines
+├── ATSPanel.tsx                # score ring, category cards, badge tooltips
+├── EditorPane.tsx              # textarea with per-mode syntax caret, no scrollbar
+└── PreviewPane.tsx             # scaled iframe preview, page break lines, print trigger
 constant/
 ├── config.ts                   # mode labels and file extensions
+├── fonts.ts                    # FONTS and FONT_IMPORTS per mode
 ├── templates.ts                # default resume content per mode
-└── theme.ts                    # all Tailwind class tokens
+└── theme.ts                    # all Tailwind class tokens (single source of truth)
 lib/
 ├── parsers.ts                  # Markdown→HTML, LaTeX→HTML, DOMPurify sanitizer
-├── ats.ts                      # 24 ATS check functions
-├── document-builder.ts         # assembles full HTML document for iframe + PDF
-└── pdf-export.ts               # print-to-PDF via hidden iframe
+├── ats.ts                      # 56 ATS checks across 8 categories
+└── document-builder.ts         # assembles full HTML document for iframe + PDF
 store/
-└── resume-store.ts             # mode + content, persisted to localStorage
+└── resume-store.ts             # mode + content only, persisted to localStorage
 types/
 └── resume.ts                   # EditorMode, ATSCheck, ATSResult, ModeConfig
 ```
@@ -56,7 +56,6 @@ Open [http://localhost:3000](http://localhost:3000).
 
 - **Image uploads** — upload images, get short `{{img-xxx}}` tags, auto-resolved to base64 in preview and PDF
 - **Font picker** — choose from a curated set of resume fonts per mode (e.g. Lato, Inter, Merriweather)
-- **Tailwind config editor** — second editor tab in HTML mode to customise `tailwind.config.js` live
 - **Theme/colour presets** — one-click accent colour swaps for the HTML template
 - **Prebuilt templates** — multiple named starting templates per mode (minimal, modern, academic, etc.)
 - **Prebuilt components** — drag-in blocks for experience entries, skill grids, education rows
