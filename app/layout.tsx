@@ -16,10 +16,18 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "ResumeForge — ATS-Friendly Resume Builder",
-  description: "Build resumes in LaTeX, Markdown, or HTML+Tailwind with live preview, font picker, ATS scoring, and PDF export.",
+  description:
+    "Build resumes in LaTeX, Markdown, or HTML+Tailwind with live preview, font picker, ATS scoring, and PDF export.",
+  icons: {
+    icon: "/icon.svg",
+  },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" className={`${dmSans.variable} ${jetbrainsMono.variable}`}>
       <body className="antialiased">{children}</body>
