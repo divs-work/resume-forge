@@ -66,5 +66,13 @@ jobs:
           script: |
             cd ~/resume-forge
             git pull origin main
+
+            # Fetch ALL secrets from GCP Secret Manager into .env
+            rm -f .env
+            while IFS= read -r secret; do
+              value=$(gcloud secrets versions access latest --secret="$secret")
+              printf '%s=%s\n' "$secret" "$value" >> .env
+            done < <(gcloud secrets list --format="value(name)" | sed 's|.*/||')
+
             docker compose up --build -d --remove-orphans
             docker image prune -f

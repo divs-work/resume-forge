@@ -19,8 +19,9 @@ FROM base AS runner
 WORKDIR /app
 
 ENV NODE_ENV=production \
-    PORT=3000 \
     HOSTNAME="0.0.0.0"
+
+# PORT is intentionally not set here — it is passed at runtime via docker-compose
 
 RUN addgroup --system --gid 1001 nodejs \
  && adduser  --system --uid 1001 nextjs
@@ -33,5 +34,6 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
-EXPOSE 3000
+ARG APP_PORT=3000
+EXPOSE ${APP_PORT}
 CMD ["node", "server.js"]
