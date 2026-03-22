@@ -24,6 +24,7 @@ export function buildResumeDocument(
 <html>
 <head>
 <meta charset="UTF-8"/>
+<base target="_blank"/>
 <link href="${fontUrl}" rel="stylesheet"/>
 ${tailwindScript}
 <style>

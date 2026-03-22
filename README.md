@@ -54,10 +54,9 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## To Do
 
-- **Image uploads** — upload images, get short `{{img-xxx}}` tags, auto-resolved to base64 in preview and PDF
 - **Font picker** — choose from a curated set of resume fonts per mode (e.g. Lato, Inter, Merriweather)
 - **Theme/colour presets** — one-click accent colour swaps for the HTML template
 - **Prebuilt templates** — multiple named starting templates per mode (minimal, modern, academic, etc.)
 - **Prebuilt components** — drag-in blocks for experience entries, skill grids, education rows
-- **Multiple resume tabs** — manage more than one resume in the same session
+- **Authentication + multi-resume saving** — sign in, save multiple named resumes to the cloud, switch between them
 - **Export to DOCX** — Word-compatible export alongside PDF
