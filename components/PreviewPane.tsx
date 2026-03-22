@@ -131,7 +131,7 @@ export default function PreviewPane({
               ref={iframeRef}
               srcDoc={renderHTML}
               className="w-198.5 h-(--total-h) border-0 bg-transparent overflow-hidden transform-[scale(var(--scale))] origin-top-left absolute top-0 left-0"
-              sandbox="allow-scripts allow-same-origin allow-modals"
+              sandbox="allow-scripts allow-same-origin allow-modals allow-popups"
               title="Resume Preview"
               tabIndex={-1}
             />
