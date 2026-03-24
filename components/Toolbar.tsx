@@ -10,6 +10,8 @@ import { shell, modeBg, toolbar } from "@/constant/theme";
 interface ToolbarProps {
   showATS: boolean;
   onToggleATS: () => void;
+  showTemplates: boolean;
+  onToggleTemplates: () => void;
   exporting: boolean;
   onExport: () => void;
 }
@@ -17,6 +19,8 @@ interface ToolbarProps {
 export default function Toolbar({
   showATS,
   onToggleATS,
+  showTemplates,
+  onToggleTemplates,
   exporting,
   onExport,
 }: ToolbarProps) {
@@ -26,6 +30,7 @@ export default function Toolbar({
   const resetTemplate = useResumeStore((s) => s.resetTemplate);
 
   const atsScore = useMemo(() => checkATS(content).score, [content]);
+
 
   return (
     <div
@@ -43,20 +48,20 @@ export default function Toolbar({
             >
               <defs>
                 <linearGradient id="bgDoc" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#1976D2" />
-                  <stop offset="100%" stop-color="#0D47A1" />
+                  <stop offset="0%" stopColor="#1976D2" />
+                  <stop offset="100%" stopColor="#0D47A1" />
                 </linearGradient>
                 <linearGradient id="fgDoc" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#FFA726" />
-                  <stop offset="100%" stop-color="#F57C00" />
+                  <stop offset="0%" stopColor="#FFA726" />
+                  <stop offset="100%" stopColor="#F57C00" />
                 </linearGradient>
                 <linearGradient id="foldGrad" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stop-color="#E65100" />
-                  <stop offset="100%" stop-color="#BF360C" />
+                  <stop offset="0%" stopColor="#E65100" />
+                  <stop offset="100%" stopColor="#BF360C" />
                 </linearGradient>
                 <linearGradient id="rGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stop-color="#BF360C" />
-                  <stop offset="100%" stop-color="#8B1A00" />
+                  <stop offset="0%" stopColor="#BF360C" />
+                  <stop offset="100%" stopColor="#8B1A00" />
                 </linearGradient>
                 <filter
                   id="docShadow"
@@ -69,8 +74,8 @@ export default function Toolbar({
                     dx="0"
                     dy="6"
                     stdDeviation="12"
-                    flood-color="#0D47A1"
-                    flood-opacity="0.22"
+                    floodColor="#0D47A1"
+                    floodOpacity="0.22"
                   />
                 </filter>
                 <filter
@@ -84,8 +89,8 @@ export default function Toolbar({
                     dx="0"
                     dy="8"
                     stdDeviation="14"
-                    flood-color="#E65100"
-                    flood-opacity="0.2"
+                    floodColor="#E65100"
+                    floodOpacity="0.2"
                   />
                 </filter>
                 <filter
@@ -99,8 +104,8 @@ export default function Toolbar({
                     dx="0"
                     dy="3"
                     stdDeviation="4"
-                    flood-color="#4E1500"
-                    flood-opacity="0.3"
+                    floodColor="#4E1500"
+                    floodOpacity="0.3"
                   />
                 </filter>
                 <clipPath id="fgClip">
@@ -122,15 +127,15 @@ export default function Toolbar({
                 />
               </g>
 
-              <g clip-path="url(#bgClip)" opacity="0.35">
+              <g clipPath="url(#bgClip)" opacity="0.35">
                 <line
                   x1="88"
                   y1="120"
                   x2="220"
                   y2="120"
                   stroke="#64B5F6"
-                  stroke-width="4"
-                  stroke-linecap="round"
+                  strokeWidth="4"
+                  strokeLinecap="round"
                 />
                 <line
                   x1="88"
@@ -138,8 +143,8 @@ export default function Toolbar({
                   x2="310"
                   y2="152"
                   stroke="#64B5F6"
-                  stroke-width="3"
-                  stroke-linecap="round"
+                  strokeWidth="3"
+                  strokeLinecap="round"
                 />
                 <line
                   x1="88"
@@ -147,8 +152,8 @@ export default function Toolbar({
                   x2="280"
                   y2="180"
                   stroke="#64B5F6"
-                  stroke-width="3"
-                  stroke-linecap="round"
+                  strokeWidth="3"
+                  strokeLinecap="round"
                 />
                 <line
                   x1="88"
@@ -156,8 +161,8 @@ export default function Toolbar({
                   x2="250"
                   y2="208"
                   stroke="#64B5F6"
-                  stroke-width="3"
-                  stroke-linecap="round"
+                  strokeWidth="3"
+                  strokeLinecap="round"
                 />
                 <line
                   x1="88"
@@ -165,8 +170,8 @@ export default function Toolbar({
                   x2="200"
                   y2="260"
                   stroke="#64B5F6"
-                  stroke-width="4"
-                  stroke-linecap="round"
+                  strokeWidth="4"
+                  strokeLinecap="round"
                 />
                 <line
                   x1="88"
@@ -174,8 +179,8 @@ export default function Toolbar({
                   x2="300"
                   y2="292"
                   stroke="#64B5F6"
-                  stroke-width="3"
-                  stroke-linecap="round"
+                  strokeWidth="3"
+                  strokeLinecap="round"
                 />
                 <line
                   x1="88"
@@ -183,8 +188,8 @@ export default function Toolbar({
                   x2="260"
                   y2="320"
                   stroke="#64B5F6"
-                  stroke-width="3"
-                  stroke-linecap="round"
+                  strokeWidth="3"
+                  strokeLinecap="round"
                 />
               </g>
 
@@ -195,15 +200,15 @@ export default function Toolbar({
                 />
               </g>
 
-              <g clip-path="url(#fgClip)" opacity="0.3">
+              <g clipPath="url(#fgClip)" opacity="0.3">
                 <line
                   x1="140"
                   y1="200"
                   x2="290"
                   y2="200"
                   stroke="#FFE0B2"
-                  stroke-width="4"
-                  stroke-linecap="round"
+                  strokeWidth="4"
+                  strokeLinecap="round"
                 />
                 <line
                   x1="140"
@@ -211,8 +216,8 @@ export default function Toolbar({
                   x2="380"
                   y2="232"
                   stroke="#FFE0B2"
-                  stroke-width="3"
-                  stroke-linecap="round"
+                  strokeWidth="3"
+                  strokeLinecap="round"
                 />
                 <line
                   x1="140"
@@ -220,8 +225,8 @@ export default function Toolbar({
                   x2="350"
                   y2="260"
                   stroke="#FFE0B2"
-                  stroke-width="3"
-                  stroke-linecap="round"
+                  strokeWidth="3"
+                  strokeLinecap="round"
                 />
                 <line
                   x1="140"
@@ -229,8 +234,8 @@ export default function Toolbar({
                   x2="320"
                   y2="288"
                   stroke="#FFE0B2"
-                  stroke-width="3"
-                  stroke-linecap="round"
+                  strokeWidth="3"
+                  strokeLinecap="round"
                 />
               </g>
 
@@ -243,7 +248,7 @@ export default function Toolbar({
                 d="M362,100 L450,188"
                 fill="none"
                 stroke="#FFCC80"
-                stroke-width="0.8"
+                strokeWidth="0.8"
                 opacity="0.25"
               />
 
@@ -251,15 +256,15 @@ export default function Toolbar({
                 d="M358,182 Q358,194 370,194 L456,194"
                 fill="none"
                 stroke="#7F2000"
-                stroke-width="1"
+                strokeWidth="1"
                 opacity="0.15"
               />
 
               <path
                 d="M124,96 L358,96"
                 stroke="#FFE0B2"
-                stroke-width="1.5"
-                stroke-linecap="round"
+                strokeWidth="1.5"
+                strokeLinecap="round"
                 opacity="0.35"
                 fill="none"
               />
@@ -268,12 +273,12 @@ export default function Toolbar({
                 <text
                   x="276"
                   y="430"
-                  font-family="'Georgia','Times New Roman',serif"
-                  font-size="168"
-                  font-weight="700"
+                  fontFamily="'Georgia','Times New Roman',serif"
+                  fontSize="168"
+                  fontWeight="700"
                   fill="url(#rGrad)"
-                  text-anchor="middle"
-                  letter-spacing="-4"
+                  textAnchor="middle"
+                  letterSpacing="-4"
                 >
                   R
                 </text>
@@ -281,12 +286,12 @@ export default function Toolbar({
               <text
                 x="274"
                 y="426"
-                font-family="'Georgia','Times New Roman',serif"
-                font-size="168"
-                font-weight="700"
+                fontFamily="'Georgia','Times New Roman',serif"
+                fontSize="168"
+                fontWeight="700"
                 fill="#FF8A65"
-                text-anchor="middle"
-                letter-spacing="-4"
+                textAnchor="middle"
+                letterSpacing="-4"
                 opacity="0.15"
               >
                 R
@@ -319,6 +324,24 @@ export default function Toolbar({
 
       {/* RIGHT */}
       <div className="flex items-center gap-1.25 flex-wrap">
+        {/* Templates */}
+        <button
+          onClick={onToggleTemplates}
+          className={`flex items-center gap-1 px-2.5 py-1.25 rounded-lg text-[11px] font-semibold border-none cursor-pointer transition-all ${
+            showTemplates
+              ? `${toolbar.atsActiveBg} ${toolbar.atsActiveText}`
+              : `${toolbar.atsInactiveBg} ${toolbar.atsInactiveText}`
+          }`}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
+            <rect x="3" y="3" width="7" height="7" rx="1" />
+            <rect x="14" y="3" width="7" height="7" rx="1" />
+            <rect x="3" y="14" width="7" height="7" rx="1" />
+            <rect x="14" y="14" width="7" height="7" rx="1" />
+          </svg>
+          Templates
+        </button>
+
         <button
           onClick={onToggleATS}
           className={`flex items-center gap-1 px-2.5 py-1.25 rounded-lg text-[11px] font-semibold border-none cursor-pointer transition-all ${

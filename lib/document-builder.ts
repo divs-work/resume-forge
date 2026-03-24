@@ -2,6 +2,29 @@ import type { EditorMode } from "@/types/resume";
 import { FONTS, FONT_IMPORTS } from "@/constant/fonts";
 import { parseMarkdown, parseLatex, sanitizeHTML } from "@/lib/parsers";
 
+// Tailwind variant prefixes that don't apply in a static iframe/print context
+const STRIP_VARIANTS = /^(?:sm|md|lg|xl|2xl|hover|focus(?:-within|-visible)?|active|visited|checked|disabled|dark|print|group-hover|group-focus|peer-hover|peer-focus|motion-(?:safe|reduce)|selection):/;
+
+// Viewport-relative classes that cause iframe feedback loops
+const STRIP_VIEWPORT = /^(?:min-h-screen|h-screen|w-screen|min-w-screen|max-h-screen|max-w-screen)$/;
+
+// Animation / transition / cursor classes not needed in static preview
+const STRIP_DYNAMIC = /^(?:transition|animate|duration|ease|delay|will-change|cursor|scroll-smooth|scroll-auto)(?:-|$)/;
+
+function shouldStrip(cls: string): boolean {
+  return STRIP_VARIANTS.test(cls) || STRIP_VIEWPORT.test(cls) || STRIP_DYNAMIC.test(cls);
+}
+
+function stripProblematicClasses(html: string): string {
+  return html.replace(/class="([^"]*)"/g, (_, classes: string) => {
+    const cleaned = classes
+      .split(/\s+/)
+      .filter((cls) => cls && !shouldStrip(cls))
+      .join(" ");
+    return `class="${cleaned}"`;
+  });
+}
+
 export function buildResumeDocument(
   rawContent: string,
   mode: EditorMode,
@@ -12,7 +35,7 @@ export function buildResumeDocument(
   } else if (mode === "markdown") {
     body = sanitizeHTML(parseMarkdown(rawContent));
   } else {
-    body = sanitizeHTML(rawContent);
+    body = stripProblematicClasses(sanitizeHTML(rawContent));
   }
 
   const fontUrl = FONT_IMPORTS[mode];
@@ -63,8 +86,15 @@ ${tailwindScript}
   }
 
   @media print {
-    html, body { width: 100%; margin: 0; padding: 0; background: #fff; overflow: visible; }
+    html, body {
+      width: 210mm;
+      margin: 0;
+      padding: 0;
+      background: #fff;
+      overflow: visible;
+    }
     a { color: inherit !important; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   }
 </style>
 </head>
