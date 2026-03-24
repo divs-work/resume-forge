@@ -13,10 +13,12 @@
     "@unified-latex/unified-latex-to-hast": "^1.8.3",
     "@unified-latex/unified-latex-util-parse": "^1.8.3",
     "dompurify": "^3.3.3",
-    "hast-util-to-html": "^9.0.5",
+    "marked": "^17.0.5",
     "next": "^16.2.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
+    "rehype-stringify": "^10.0.1",
+    "unified": "^11.0.5",
     "zustand": "^5.0.12"
   },
   "devDependencies": {

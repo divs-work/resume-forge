@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import { useResumeStore } from "@/store/resume-store";
-import { TEMPLATE_SETS } from "@/constant/templates";
+import { TEMPLATE_STYLES } from "@/constant/templates";
 import { buildResumeDocument } from "@/lib/document-builder";
 import { MODE_CONFIG } from "@/constant/config";
 import { shell, modeBg } from "@/constant/theme";
@@ -16,26 +16,35 @@ const CARD_H = Math.round(PREVIEW_H * SCALE); // ~118px
 export default function TemplatesPanel() {
   const mode = useResumeStore((s) => s.mode);
   const setContent = useResumeStore((s) => s.setContent);
+  const setMarkdownTheme = useResumeStore((s) => s.setMarkdownTheme);
+  const setLatexTheme = useResumeStore((s) => s.setLatexTheme);
 
-  const templates = TEMPLATE_SETS[mode];
+  const templates = TEMPLATE_STYLES[mode];
 
   const previewDocs = useMemo(
-    () => templates.map((tpl) => buildResumeDocument(tpl.content, mode)),
+    () =>
+      templates.map((tpl) => buildResumeDocument(tpl.content, mode, tpl.theme)),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [mode],
+    [mode]
   );
 
   return (
-    <div className={`border-b shrink-0 ${shell.bg} ${shell.border} overflow-hidden`}>
+    <div
+      className={`border-b shrink-0 ${shell.bg} ${shell.border} overflow-hidden`}
+    >
       <div className="flex items-stretch gap-0 h-full">
         {/* Left label */}
         <div
           className={`flex flex-col justify-center gap-1.5 px-5 py-4 border-r ${shell.border} shrink-0 min-w-[120px]`}
         >
-          <div className={`text-[9px] font-bold uppercase tracking-[0.18em] ${shell.textFaint}`}>
+          <div
+            className={`text-[9px] font-bold uppercase tracking-[0.18em] ${shell.textFaint}`}
+          >
             Templates
           </div>
-          <div className={`text-[13px] font-semibold ${shell.text} leading-tight`}>
+          <div
+            className={`text-[13px] font-semibold ${shell.text} leading-tight`}
+          >
             {MODE_CONFIG[mode].label}
           </div>
           <div className={`text-[10px] ${shell.textMuted} leading-snug`}>
@@ -48,7 +57,16 @@ export default function TemplatesPanel() {
           {templates.map((tpl, i) => (
             <button
               key={tpl.id}
-              onClick={() => setContent(tpl.content)}
+              onClick={() => {
+                setContent(tpl.content);
+                if (mode !== "html") {
+                  if (mode === "latex") {
+                    setLatexTheme(tpl.theme!);
+                  } else {
+                    setMarkdownTheme(tpl.theme!);
+                  }
+                }
+              }}
               className={`group flex-shrink-0 rounded-xl border ${shell.border} overflow-hidden bg-white text-left cursor-pointer hover:border-gray-400 hover:shadow-md transition-all focus:outline-none`}
               style={{ width: CARD_W }}
             >
@@ -80,8 +98,16 @@ export default function TemplatesPanel() {
 
               {/* Label */}
               <div className="px-2.5 py-2">
-                <p className={`text-[11px] font-semibold ${shell.text} truncate`}>{tpl.name}</p>
-                <p className={`text-[9.5px] ${shell.textMuted} truncate mt-0.5`}>{tpl.description}</p>
+                <p
+                  className={`text-[11px] font-semibold ${shell.text} truncate`}
+                >
+                  {tpl.name}
+                </p>
+                <p
+                  className={`text-[9.5px] ${shell.textMuted} truncate mt-0.5`}
+                >
+                  {tpl.description}
+                </p>
               </div>
             </button>
           ))}

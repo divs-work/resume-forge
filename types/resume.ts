@@ -15,5 +15,26 @@ export interface ModeConfig {
   fileExt: string;
 }
 
+export interface ResumeTheme {
+  h1: string;
+  h2: string;
+  h3: string;
+  h4: string;
+  p: string;
+  ul: string;
+  ol: string;
+  li: string;
+  strong: string;
+  em: string;
+  hr: string;
+  a: string;
+  table: string;
+  thead: string;
+  tbody: string;
+  tr: string;
+  th: string;
+  td: string;
+}
+
 export type EditorMode = "latex" | "markdown" | "html";
 export type View = "editor" | "parsed";

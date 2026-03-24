@@ -21,6 +21,8 @@ export default function PreviewPane({
   const parsed = useResumeStore((s) => s.parsed[s.mode]);
   const parsedChanged = useResumeStore((s) => s.parsedChanged);
   const contentChanged = useResumeStore((s) => s.contentChanged);
+  const markdownTheme = useResumeStore((s) => s.markdownTheme);
+  const latexTheme = useResumeStore((s) => s.latexTheme);
 
   const cfg = MODE_CONFIG[mode];
   const outerRef = useRef<HTMLDivElement>(null);
@@ -29,10 +31,15 @@ export default function PreviewPane({
   const [scale, setScale] = useState(0.7);
   const [pageCount, setPageCount] = useState(1);
 
-  const docHTML = useMemo(
-    () => buildResumeDocument(content, mode),
-    [content, mode],
-  );
+  const docHTML = useMemo(() => {
+    if (mode === "html") {
+      return buildResumeDocument(content, mode);
+    } else if (mode === "markdown") {
+      return buildResumeDocument(content, mode, markdownTheme);
+    } else if (mode === "latex") {
+      return buildResumeDocument(content, mode, latexTheme);
+    }
+  }, [content, mode, markdownTheme, latexTheme]);
 
   const updateScale = useCallback(() => {
     if (!outerRef.current) return;

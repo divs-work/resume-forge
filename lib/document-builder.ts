@@ -1,18 +1,25 @@
-import type { EditorMode } from "@/types/resume";
+import type { EditorMode, ResumeTheme } from "@/types/resume";
 import { FONTS, FONT_IMPORTS } from "@/constant/fonts";
 import { parseMarkdown, parseLatex, sanitizeHTML } from "@/lib/parsers";
 
 // Tailwind variant prefixes that don't apply in a static iframe/print context
-const STRIP_VARIANTS = /^(?:sm|md|lg|xl|2xl|hover|focus(?:-within|-visible)?|active|visited|checked|disabled|dark|print|group-hover|group-focus|peer-hover|peer-focus|motion-(?:safe|reduce)|selection):/;
+const STRIP_VARIANTS =
+  /^(?:sm|md|lg|xl|2xl|hover|focus(?:-within|-visible)?|active|visited|checked|disabled|dark|print|group-hover|group-focus|peer-hover|peer-focus|motion-(?:safe|reduce)|selection):/;
 
 // Viewport-relative classes that cause iframe feedback loops
-const STRIP_VIEWPORT = /^(?:min-h-screen|h-screen|w-screen|min-w-screen|max-h-screen|max-w-screen)$/;
+const STRIP_VIEWPORT =
+  /^(?:min-h-screen|h-screen|w-screen|min-w-screen|max-h-screen|max-w-screen)$/;
 
 // Animation / transition / cursor classes not needed in static preview
-const STRIP_DYNAMIC = /^(?:transition|animate|duration|ease|delay|will-change|cursor|scroll-smooth|scroll-auto)(?:-|$)/;
+const STRIP_DYNAMIC =
+  /^(?:transition|animate|duration|ease|delay|will-change|cursor|scroll-smooth|scroll-auto)(?:-|$)/;
 
 function shouldStrip(cls: string): boolean {
-  return STRIP_VARIANTS.test(cls) || STRIP_VIEWPORT.test(cls) || STRIP_DYNAMIC.test(cls);
+  return (
+    STRIP_VARIANTS.test(cls) ||
+    STRIP_VIEWPORT.test(cls) ||
+    STRIP_DYNAMIC.test(cls)
+  );
 }
 
 function stripProblematicClasses(html: string): string {
@@ -28,12 +35,13 @@ function stripProblematicClasses(html: string): string {
 export function buildResumeDocument(
   rawContent: string,
   mode: EditorMode,
+  theme?: ResumeTheme
 ): string {
   let body: string;
   if (mode === "latex") {
-    body = sanitizeHTML(parseLatex(rawContent));
+    body = sanitizeHTML(parseLatex(rawContent, theme!));
   } else if (mode === "markdown") {
-    body = sanitizeHTML(parseMarkdown(rawContent));
+    body = sanitizeHTML(parseMarkdown(rawContent, theme!));
   } else {
     body = stripProblematicClasses(sanitizeHTML(rawContent));
   }
