@@ -2,6 +2,157 @@
 // HTML TEMPLATES (FULL COLLECTION: CONTENT-HEAVY & CREATIVE VARIANTS)
 // ─────────────────────────────────────────────────────────────────────────────
 
+export const DEFAULT_HTML_TEMPLATE = `<div class="w-full font-['Inter',sans-serif] bg-[#F3F4F6] text-[#111827] px-8 py-6 min-h-[297mm] flex flex-col gap-3 relative z-0">
+
+  <header class="bg-white rounded-2xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100 flex items-center justify-between">
+    <div>
+      <h1 class="text-[38px] font-black tracking-tight leading-none text-[#0F172A] mb-1.5">Your Name</h1>
+      <p class="text-[13px] font-semibold text-[#6366F1] uppercase tracking-[0.15em]">Senior Software Engineer</p>
+    </div>
+    <div class="flex flex-col items-end gap-1.5">
+      <div class="flex items-center gap-1.5">
+        <a href="mailto:your@email.com" class="text-[10.5px] font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors">your@email.com</a>
+        <a href="tel:+15551234567" class="text-[10.5px] font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors">+1 (555) 123-4567</a>
+      </div>
+      <div class="flex items-center gap-1.5">
+        <a href="https://linkedin.com/in/yourname" class="text-[10.5px] font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors">linkedin.com/in/yourname</a>
+        <a href="https://github.com/yourusername" class="text-[10.5px] font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors">github.com/yourusername</a>
+        <a href="https://yourwebsite.com" class="text-[10.5px] font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors">yourwebsite.com</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-12 gap-3 flex-1">
+
+    <div class="col-span-8 flex flex-col gap-3">
+
+      <section class="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100 flex-1">
+        <div class="flex items-center gap-2.5 mb-4">
+          <div class="w-7 h-7 rounded-lg bg-[#EEF2FF] flex items-center justify-center text-[#6366F1]">
+            <svg class="w-3.5 h-3.5 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+          </div>
+          <h2 class="text-[15px] font-extrabold text-[#0F172A] tracking-tight">Experience</h2>
+        </div>
+
+        <div class="space-y-4">
+          <div class="group">
+            <div class="flex justify-between items-start mb-1.5">
+              <div>
+                <h3 class="text-[13.5px] font-bold text-[#111827] group-hover:text-[#6366F1] transition-colors">Staff Software Engineer</h3>
+                <p class="text-[11.5px] font-medium text-gray-500">TechNova Solutions <span class="mx-1">•</span> San Francisco, CA</p>
+              </div>
+              <span class="text-[9.5px] font-bold text-[#6366F1] bg-[#EEF2FF] px-2 py-1 rounded-md">2023 – Present</span>
+            </div>
+            <ul class="space-y-1">
+              <li class="text-[11.5px] text-gray-600 leading-[1.45] pl-3.5 relative before:content-['→'] before:absolute before:left-0 before:text-gray-300 before:font-bold">Architected a micro-frontend architecture using Next.js and Module Federation, reducing build times by 45% and enabling independent deployments for 4 engineering squads.</li>
+              <li class="text-[11.5px] text-gray-600 leading-[1.45] pl-3.5 relative before:content-['→'] before:absolute before:left-0 before:text-gray-300 before:font-bold">Led the transition to a serverless backend on AWS, cutting operational costs by $120k annually while handling 5M+ daily requests.</li>
+              <li class="text-[11.5px] text-gray-600 leading-[1.45] pl-3.5 relative before:content-['→'] before:absolute before:left-0 before:text-gray-300 before:font-bold">Implemented robust CI/CD pipelines and end-to-end testing protocols, increasing release frequency from bi-weekly to daily.</li>
+            </ul>
+          </div>
+
+          <div class="w-full h-[1px] bg-gray-100"></div>
+
+          <div class="group">
+            <div class="flex justify-between items-start mb-1.5">
+              <div>
+                <h3 class="text-[13.5px] font-bold text-[#111827] group-hover:text-[#6366F1] transition-colors">Senior Full-Stack Developer</h3>
+                <p class="text-[11.5px] font-medium text-gray-500">Quantum Leap Inc. <span class="mx-1">•</span> Remote</p>
+              </div>
+              <span class="text-[9.5px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">2020 – 2023</span>
+            </div>
+            <ul class="space-y-1">
+              <li class="text-[11.5px] text-gray-600 leading-[1.45] pl-3.5 relative before:content-['→'] before:absolute before:left-0 before:text-gray-300 before:font-bold">Built scalable REST APIs using Node.js and Express to power the core analytics dashboard, maintaining sub-100ms response times under heavy load.</li>
+              <li class="text-[11.5px] text-gray-600 leading-[1.45] pl-3.5 relative before:content-['→'] before:absolute before:left-0 before:text-gray-300 before:font-bold">Refactored legacy React codebase to use functional components and custom hooks, shrinking bundle size by 30%.</li>
+              <li class="text-[11.5px] text-gray-600 leading-[1.45] pl-3.5 relative before:content-['→'] before:absolute before:left-0 before:text-gray-300 before:font-bold">Mentored 3 junior developers through pair programming and comprehensive PR reviews.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="grid grid-cols-2 gap-3">
+        <div class="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100 hover:border-[#6366F1]/30 transition-colors">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-[13.5px] font-bold text-[#0F172A]">OpenStream <span class="text-[9px] font-normal bg-green-100 text-green-700 px-1.5 py-0.5 rounded ml-1">Live</span></h3>
+          </div>
+          <p class="text-[11px] text-gray-500 leading-[1.45] mb-2.5">Real-time collaboration tool built with WebSockets and Redis. Supports 10k concurrent users per room.</p>
+          <div class="flex flex-wrap gap-1"><span class="text-[8.5px] font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded">React</span><span class="text-[8.5px] font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded">Node.js</span></div>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100 hover:border-[#6366F1]/30 transition-colors">
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-[13.5px] font-bold text-[#0F172A]">Aura UI <span class="text-[9px] font-normal bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded ml-1">OSS</span></h3>
+          </div>
+          <p class="text-[11px] text-gray-500 leading-[1.45] mb-2.5">Accessible React component library downloaded 10k+ times. Highly customizable via Tailwind presets.</p>
+          <div class="flex flex-wrap gap-1"><span class="text-[8.5px] font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded">TypeScript</span><span class="text-[8.5px] font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded">Tailwind</span></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-span-4 flex flex-col gap-3">
+
+      <section class="bg-[#0F172A] rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-24 h-24 bg-[#6366F1] rounded-full blur-[50px] opacity-30"></div>
+        <h2 class="text-[11px] font-bold text-white uppercase tracking-widest mb-2 relative z-10">Philosophy</h2>
+        <p class="text-[11.5px] text-gray-300 leading-[1.55] relative z-10 font-medium">I build resilient, high-performance web systems. I believe in typed languages, automated testing, reducing cloud bloat, and creating developer experiences that prioritize velocity without sacrificing stability.</p>
+      </section>
+
+      <section class="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100 flex-1">
+        <div class="flex items-center gap-2.5 mb-4">
+          <div class="w-7 h-7 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500">
+            <svg class="w-3.5 h-3.5 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          </div>
+          <h2 class="text-[15px] font-extrabold text-[#0F172A] tracking-tight">Toolkit</h2>
+        </div>
+
+        <div class="space-y-3.5">
+          <div>
+            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Frontend Core</p>
+            <div class="flex flex-wrap gap-1">
+              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">React</span>
+              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Next.js</span>
+              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">TypeScript</span>
+              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Tailwind CSS</span>
+            </div>
+          </div>
+
+          <div>
+            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Backend & DB</p>
+            <div class="flex flex-wrap gap-1">
+              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Node.js</span>
+              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Python</span>
+              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">PostgreSQL</span>
+              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Redis</span>
+            </div>
+          </div>
+
+          <div>
+            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Infrastructure</p>
+            <div class="flex flex-wrap gap-1">
+              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">AWS</span>
+              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Docker</span>
+              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Data Structures</span>
+              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">CI/CD</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100">
+        <div class="flex items-center gap-2.5 mb-3">
+          <div class="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500">
+            <svg class="w-3.5 h-3.5 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
+          </div>
+          <h2 class="text-[15px] font-extrabold text-[#0F172A] tracking-tight">Education</h2>
+        </div>
+        <h3 class="text-[12.5px] font-bold text-[#111827]">B.S. Computer Science</h3>
+        <p class="text-[10.5px] font-medium text-gray-500 mt-0.5">University of Technology</p>
+        <p class="text-[9.5px] font-bold text-gray-400 mt-1.5">Class of 2020</p>
+      </section>
+
+    </div>
+  </div>
+</div>`;
+
 export const HTML_DARK_MINIMAL = `<div class="w-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#111] to-[#050505] text-[#fafafa] font-sans px-10 py-8 box-border flex flex-col justify-between min-h-[297mm]">
 
   <header class="mb-4">
@@ -157,157 +308,6 @@ export const HTML_DARK_MINIMAL = `<div class="w-full bg-[radial-gradient(ellipse
             <span class="text-[9px] text-white/40">Guest Speaker @ CityTech Meetup</span>
           </li>
         </ul>
-      </section>
-
-    </div>
-  </div>
-</div>`;
-
-export const HTML_CLEAN_LIGHT = `<div class="w-full font-['Inter',sans-serif] bg-[#F3F4F6] text-[#111827] px-8 py-6 min-h-[297mm] flex flex-col gap-3 relative z-0">
-
-  <header class="bg-white rounded-2xl p-6 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100 flex items-center justify-between">
-    <div>
-      <h1 class="text-[38px] font-black tracking-tight leading-none text-[#0F172A] mb-1.5">Your Name</h1>
-      <p class="text-[13px] font-semibold text-[#6366F1] uppercase tracking-[0.15em]">Senior Software Engineer</p>
-    </div>
-    <div class="flex flex-col items-end gap-1.5">
-      <div class="flex items-center gap-1.5">
-        <a href="mailto:your@email.com" class="text-[10.5px] font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors">your@email.com</a>
-        <a href="tel:+15551234567" class="text-[10.5px] font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors">+1 (555) 123-4567</a>
-      </div>
-      <div class="flex items-center gap-1.5">
-        <a href="https://linkedin.com/in/yourname" class="text-[10.5px] font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors">linkedin.com/in/yourname</a>
-        <a href="https://github.com/yourusername" class="text-[10.5px] font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors">github.com/yourusername</a>
-        <a href="https://yourwebsite.com" class="text-[10.5px] font-medium text-gray-600 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-200 hover:bg-gray-100 transition-colors">yourwebsite.com</a>
-      </div>
-    </div>
-  </header>
-
-  <div class="grid grid-cols-12 gap-3 flex-1">
-
-    <div class="col-span-8 flex flex-col gap-3">
-
-      <section class="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100 flex-1">
-        <div class="flex items-center gap-2.5 mb-4">
-          <div class="w-7 h-7 rounded-lg bg-[#EEF2FF] flex items-center justify-center text-[#6366F1]">
-            <svg class="w-3.5 h-3.5 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
-          </div>
-          <h2 class="text-[15px] font-extrabold text-[#0F172A] tracking-tight">Experience</h2>
-        </div>
-
-        <div class="space-y-4">
-          <div class="group">
-            <div class="flex justify-between items-start mb-1.5">
-              <div>
-                <h3 class="text-[13.5px] font-bold text-[#111827] group-hover:text-[#6366F1] transition-colors">Staff Software Engineer</h3>
-                <p class="text-[11.5px] font-medium text-gray-500">TechNova Solutions <span class="mx-1">•</span> San Francisco, CA</p>
-              </div>
-              <span class="text-[9.5px] font-bold text-[#6366F1] bg-[#EEF2FF] px-2 py-1 rounded-md">2023 – Present</span>
-            </div>
-            <ul class="space-y-1">
-              <li class="text-[11.5px] text-gray-600 leading-[1.45] pl-3.5 relative before:content-['→'] before:absolute before:left-0 before:text-gray-300 before:font-bold">Architected a micro-frontend architecture using Next.js and Module Federation, reducing build times by 45% and enabling independent deployments for 4 engineering squads.</li>
-              <li class="text-[11.5px] text-gray-600 leading-[1.45] pl-3.5 relative before:content-['→'] before:absolute before:left-0 before:text-gray-300 before:font-bold">Led the transition to a serverless backend on AWS, cutting operational costs by $120k annually while handling 5M+ daily requests.</li>
-              <li class="text-[11.5px] text-gray-600 leading-[1.45] pl-3.5 relative before:content-['→'] before:absolute before:left-0 before:text-gray-300 before:font-bold">Implemented robust CI/CD pipelines and end-to-end testing protocols, increasing release frequency from bi-weekly to daily.</li>
-            </ul>
-          </div>
-
-          <div class="w-full h-[1px] bg-gray-100"></div>
-
-          <div class="group">
-            <div class="flex justify-between items-start mb-1.5">
-              <div>
-                <h3 class="text-[13.5px] font-bold text-[#111827] group-hover:text-[#6366F1] transition-colors">Senior Full-Stack Developer</h3>
-                <p class="text-[11.5px] font-medium text-gray-500">Quantum Leap Inc. <span class="mx-1">•</span> Remote</p>
-              </div>
-              <span class="text-[9.5px] font-bold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">2020 – 2023</span>
-            </div>
-            <ul class="space-y-1">
-              <li class="text-[11.5px] text-gray-600 leading-[1.45] pl-3.5 relative before:content-['→'] before:absolute before:left-0 before:text-gray-300 before:font-bold">Built scalable REST APIs using Node.js and Express to power the core analytics dashboard, maintaining sub-100ms response times under heavy load.</li>
-              <li class="text-[11.5px] text-gray-600 leading-[1.45] pl-3.5 relative before:content-['→'] before:absolute before:left-0 before:text-gray-300 before:font-bold">Refactored legacy React codebase to use functional components and custom hooks, shrinking bundle size by 30%.</li>
-              <li class="text-[11.5px] text-gray-600 leading-[1.45] pl-3.5 relative before:content-['→'] before:absolute before:left-0 before:text-gray-300 before:font-bold">Mentored 3 junior developers through pair programming and comprehensive PR reviews.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section class="grid grid-cols-2 gap-3">
-        <div class="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100 hover:border-[#6366F1]/30 transition-colors">
-          <div class="flex justify-between items-start mb-2">
-            <h3 class="text-[13.5px] font-bold text-[#0F172A]">OpenStream <span class="text-[9px] font-normal bg-green-100 text-green-700 px-1.5 py-0.5 rounded ml-1">Live</span></h3>
-          </div>
-          <p class="text-[11px] text-gray-500 leading-[1.45] mb-2.5">Real-time collaboration tool built with WebSockets and Redis. Supports 10k concurrent users per room.</p>
-          <div class="flex flex-wrap gap-1"><span class="text-[8.5px] font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded">React</span><span class="text-[8.5px] font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded">Node.js</span></div>
-        </div>
-
-        <div class="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100 hover:border-[#6366F1]/30 transition-colors">
-          <div class="flex justify-between items-start mb-2">
-            <h3 class="text-[13.5px] font-bold text-[#0F172A]">Aura UI <span class="text-[9px] font-normal bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded ml-1">OSS</span></h3>
-          </div>
-          <p class="text-[11px] text-gray-500 leading-[1.45] mb-2.5">Accessible React component library downloaded 10k+ times. Highly customizable via Tailwind presets.</p>
-          <div class="flex flex-wrap gap-1"><span class="text-[8.5px] font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded">TypeScript</span><span class="text-[8.5px] font-semibold text-gray-600 bg-gray-100 px-2 py-1 rounded">Tailwind</span></div>
-        </div>
-      </section>
-    </div>
-
-    <div class="col-span-4 flex flex-col gap-3">
-
-      <section class="bg-[#0F172A] rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] relative overflow-hidden">
-        <div class="absolute top-0 right-0 w-24 h-24 bg-[#6366F1] rounded-full blur-[50px] opacity-30"></div>
-        <h2 class="text-[11px] font-bold text-white uppercase tracking-widest mb-2 relative z-10">Philosophy</h2>
-        <p class="text-[11.5px] text-gray-300 leading-[1.55] relative z-10 font-medium">I build resilient, high-performance web systems. I believe in typed languages, automated testing, reducing cloud bloat, and creating developer experiences that prioritize velocity without sacrificing stability.</p>
-      </section>
-
-      <section class="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100 flex-1">
-        <div class="flex items-center gap-2.5 mb-4">
-          <div class="w-7 h-7 rounded-lg bg-orange-50 flex items-center justify-center text-orange-500">
-            <svg class="w-3.5 h-3.5 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
-          </div>
-          <h2 class="text-[15px] font-extrabold text-[#0F172A] tracking-tight">Toolkit</h2>
-        </div>
-
-        <div class="space-y-3.5">
-          <div>
-            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Frontend Core</p>
-            <div class="flex flex-wrap gap-1">
-              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">React</span>
-              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Next.js</span>
-              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">TypeScript</span>
-              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Tailwind CSS</span>
-            </div>
-          </div>
-
-          <div>
-            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Backend & DB</p>
-            <div class="flex flex-wrap gap-1">
-              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Node.js</span>
-              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Python</span>
-              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">PostgreSQL</span>
-              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Redis</span>
-            </div>
-          </div>
-
-          <div>
-            <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1.5">Infrastructure</p>
-            <div class="flex flex-wrap gap-1">
-              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">AWS</span>
-              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Docker</span>
-              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">Data Structures</span>
-              <span class="text-[10.5px] font-semibold text-[#111827] bg-gray-50 border border-gray-200 px-2 py-0.5 rounded-md">CI/CD</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="bg-white rounded-2xl p-5 shadow-[0_2px_10px_rgba(0,0,0,0.02)] border border-gray-100">
-        <div class="flex items-center gap-2.5 mb-3">
-          <div class="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center text-purple-500">
-            <svg class="w-3.5 h-3.5 stroke-current" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 9 3 12 0v-5"></path></svg>
-          </div>
-          <h2 class="text-[15px] font-extrabold text-[#0F172A] tracking-tight">Education</h2>
-        </div>
-        <h3 class="text-[12.5px] font-bold text-[#111827]">B.S. Computer Science</h3>
-        <p class="text-[10.5px] font-medium text-gray-500 mt-0.5">University of Technology</p>
-        <p class="text-[9.5px] font-bold text-gray-400 mt-1.5">Class of 2020</p>
       </section>
 
     </div>
