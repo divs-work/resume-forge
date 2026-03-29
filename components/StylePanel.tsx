@@ -17,7 +17,7 @@ interface Props {
   selected: SelectedEl;
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
   onClose: () => void;
-  setFocusLine: (line: number | null) => void;
+  setFocusLineAction: (line: number | null) => void;
 }
 
 function rgbToHex(rgb: string): string {
@@ -26,7 +26,7 @@ function rgbToHex(rgb: string): string {
   return "#" + [m[1], m[2], m[3]].map((n) => parseInt(n).toString(16).padStart(2, "0")).join("");
 }
 
-export default function StylePanel({ selected, iframeRef, onClose, setFocusLine }: Props) {
+export default function StylePanel({ selected, iframeRef, onClose, setFocusLineAction }: Props) {
   const [text, setText]         = useState(selected.text);
   const [fontSize, setFontSize] = useState(selected.computedFontSize.replace(/[^0-9.]/g, ""));
   const [color, setColor]       = useState(rgbToHex(selected.computedColor));
@@ -88,7 +88,7 @@ export default function StylePanel({ selected, iframeRef, onClose, setFocusLine 
       const fragment = searchText.slice(0, STYLE_PANEL_TEXT_FRAGMENT).trim();
       if (fragment) lineNum = lines.findIndex((l) => l.includes(fragment));
     }
-    if (lineNum >= 0) setFocusLine(lineNum + 1);
+    if (lineNum >= 0) setFocusLineAction(lineNum + 1);
     onClose();
   }
 
