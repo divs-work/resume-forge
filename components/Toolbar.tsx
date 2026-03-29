@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, type ChangeEvent } from "react";
 import { useResumeStore } from "@/store/resume-store";
 import { checkATS } from "@/lib/ats";
 import { MODE_CONFIG } from "@/constant/config";
@@ -31,15 +31,27 @@ export default function Toolbar({
   const resetTemplate = useResumeStore((s) => s.resetTemplate);
   const fontId = useResumeStore((s) => s.fontId);
   const setFontId = useResumeStore((s) => s.setFontId);
+  const templateLayout = useResumeStore((s) => s.templateLayout);
+  const setTemplateLayout = useResumeStore((s) => s.setTemplateLayout);
 
   const atsScore = useMemo(() => checkATS(content).score, [content]);
 
+  const handleMarginChange  = (e: ChangeEvent<HTMLInputElement>) => setTemplateLayout({ marginMm: Number(e.target.value) });
+  const handlePaddingChange = (e: ChangeEvent<HTMLInputElement>) => setTemplateLayout({ paddingMm: Number(e.target.value) });
+  const handleSpacingChange = (e: ChangeEvent<HTMLInputElement>) => setTemplateLayout({ lineHeight: Number(e.target.value) });
+  const handleFontChange    = (e: ChangeEvent<HTMLSelectElement>) => setFontId(e.target.value);
+
+  const templatesBtnCls = showTemplates
+    ? `${toolbar.atsActiveBg} ${toolbar.atsActiveText}`
+    : `${toolbar.atsInactiveBg} ${toolbar.atsInactiveText}`;
+  const atsBtnCls = showATS
+    ? `${toolbar.atsActiveBg} ${toolbar.atsActiveText}`
+    : `${toolbar.atsInactiveBg} ${toolbar.atsInactiveText}`;
 
   return (
     <div
       className={`flex items-center justify-between px-4 py-2 ${shell.bg} border-b ${shell.border} gap-2 flex-wrap shrink-0`}
     >
-      {/* LEFT */}
       <div className="flex items-center gap-2.5">
         <div className="flex items-center gap-1.5">
           <div className={`w-6 h-6 flex items-center justify-center`}>
@@ -309,44 +321,73 @@ export default function Toolbar({
         </div>
         <div className={`w-px h-4.4 ${shell.divider}`} />
         <div className={`flex ${shell.bgMuted} rounded-lg p-0.5 gap-0.5`}>
-          {(["markdown", "latex", "html"] as EditorMode[]).map((m) => (
-            <button
-              key={m}
-              onClick={() => setMode(m)}
-              className={`px-3 py-1.25 rounded-md text-[11px] font-medium transition-all ${
-                mode === m
-                  ? `${shell.bg} shadow-sm ${shell.text}`
-                  : `${shell.textMuted} ${shell.hoverText}`
-              }`}
-            >
-              {MODE_CONFIG[m].label}
-            </button>
-          ))}
+          {(["markdown", "latex", "html"] as EditorMode[]).map((m) => {
+            const btnCls = mode === m
+              ? `${shell.bg} shadow-sm ${shell.text}`
+              : `${shell.textMuted} ${shell.hoverText}`;
+            return (
+              <button
+                key={m}
+                onClick={() => setMode(m)}
+                className={`px-3 py-1.25 rounded-md text-[11px] font-medium transition-all ${btnCls}`}
+              >
+                {MODE_CONFIG[m].label}
+              </button>
+            );
+          })}
         </div>
+
+        {(mode === "markdown" || mode === "latex") && (
+          <>
+            <div className={`w-px h-4 ${shell.divider}`} />
+            <div className="flex items-center gap-1.5">
+              <span className={`text-[10px] ${shell.textFaint} whitespace-nowrap`}>Margin</span>
+              <input
+                type="number" min={5} max={40}
+                value={templateLayout.marginMm}
+                onChange={handleMarginChange}
+                className={`w-10 px-1 py-1 rounded text-[11px] text-center ${shell.bgMuted} ${shell.textMuted} border-none outline-none`}
+              />
+              <span className={`text-[10px] ${shell.textFaint}`}>mm</span>
+              <span className={`text-[10px] ${shell.textFaint} whitespace-nowrap ml-1`}>Pad</span>
+              <input
+                type="number" min={5} max={40}
+                value={templateLayout.paddingMm}
+                onChange={handlePaddingChange}
+                className={`w-10 px-1 py-1 rounded text-[11px] text-center ${shell.bgMuted} ${shell.textMuted} border-none outline-none`}
+              />
+              <span className={`text-[10px] ${shell.textFaint}`}>mm</span>
+              <span className={`text-[10px] ${shell.textFaint} whitespace-nowrap ml-1`}>Spacing</span>
+              <input
+                type="number" min={1} max={3} step={0.1}
+                value={templateLayout.lineHeight}
+                onChange={handleSpacingChange}
+                className={`w-12 px-1 py-1 rounded text-[11px] text-center ${shell.bgMuted} ${shell.textMuted} border-none outline-none`}
+              />
+            </div>
+          </>
+        )}
       </div>
 
-      {/* RIGHT */}
       <div className="flex items-center gap-1.25 flex-wrap">
-        {/* Global font */}
         <select
           value={fontId}
-          onChange={(e) => setFontId(e.target.value)}
+          onChange={handleFontChange}
           className={`px-2 py-1.25 rounded-lg text-[11px] font-medium border-none cursor-pointer ${shell.bgMuted} ${shell.textMuted} outline-none`}
         >
           <option value="">Default Font</option>
-          {FONT_OPTIONS.map((f) => (
-            <option key={f.id} value={f.id}>{f.name}</option>
+          {(["sans-serif", "display", "serif", "monospace"] as const).map((cat) => (
+            <optgroup key={cat} label={cat.charAt(0).toUpperCase() + cat.slice(1).replace("-", "-")}>
+              {FONT_OPTIONS.filter((f) => f.category === cat).map((f) => (
+                <option key={f.id} value={f.id}>{f.name}</option>
+              ))}
+            </optgroup>
           ))}
         </select>
         <div className={`w-px h-4 ${shell.divider}`} />
-        {/* Templates */}
         <button
           onClick={onToggleTemplates}
-          className={`flex items-center gap-1 px-2.5 py-1.25 rounded-lg text-[11px] font-semibold border-none cursor-pointer transition-all ${
-            showTemplates
-              ? `${toolbar.atsActiveBg} ${toolbar.atsActiveText}`
-              : `${toolbar.atsInactiveBg} ${toolbar.atsInactiveText}`
-          }`}
+          className={`flex items-center gap-1 px-2.5 py-1.25 rounded-lg text-[11px] font-semibold border-none cursor-pointer transition-all ${templatesBtnCls}`}
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
             <rect x="3" y="3" width="7" height="7" rx="1" />
@@ -359,11 +400,7 @@ export default function Toolbar({
 
         <button
           onClick={onToggleATS}
-          className={`flex items-center gap-1 px-2.5 py-1.25 rounded-lg text-[11px] font-semibold border-none cursor-pointer transition-all ${
-            showATS
-              ? `${toolbar.atsActiveBg} ${toolbar.atsActiveText}`
-              : `${toolbar.atsInactiveBg} ${toolbar.atsInactiveText}`
-          }`}
+          className={`flex items-center gap-1 px-2.5 py-1.25 rounded-lg text-[11px] font-semibold border-none cursor-pointer transition-all ${atsBtnCls}`}
         >
           <svg
             viewBox="0 0 24 24"

@@ -5,10 +5,6 @@ export interface ATSCheck {
   category: string;
 }
 
-export interface ATSResult {
-  checks: ATSCheck[];
-  score: number;
-}
 
 export interface ModeConfig {
   label: string;
@@ -34,6 +30,12 @@ export interface ResumeTheme {
   tr: string;
   th: string;
   td: string;
+}
+
+export interface TemplateLayout {
+  marginMm: number;
+  paddingMm: number;
+  lineHeight: number;
 }
 
 export type EditorMode = "latex" | "markdown" | "html";

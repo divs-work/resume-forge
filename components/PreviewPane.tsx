@@ -2,14 +2,9 @@
 
 import { useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { useResumeStore } from "@/store/resume-store";
-import { MODE_CONFIG } from "@/constant/config";
+import { MODE_CONFIG, A4_WIDTH_PX, A4_HEIGHT_PX } from "@/constant/config";
 import { buildResumeDocument } from "@/lib/document-builder";
-import { applyStyleToSource, replaceTextInSource } from "@/lib/source-patcher";
 import { shell, canvas } from "@/constant/theme";
-import FloatingStyleBar, { type ClickInfo } from "./FloatingStyleBar";
-
-const A4_WIDTH = 794;
-const A4_HEIGHT = 1123;
 
 export default function PreviewPane({
   exporting,
@@ -18,32 +13,31 @@ export default function PreviewPane({
   exporting: boolean;
   setExportingAction: (n: boolean) => void;
 }) {
+  const [scale,     setScale]     = useState(0.7);
+  const [pageCount, setPageCount] = useState(1);
+
+  const outerRef  = useRef<HTMLDivElement>(null);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
   const mode           = useResumeStore((s) => s.mode);
   const content        = useResumeStore((s) => s.content[s.mode]);
   const markdownTheme  = useResumeStore((s) => s.markdownTheme);
   const latexTheme     = useResumeStore((s) => s.latexTheme);
+  const templateLayout = useResumeStore((s) => s.templateLayout);
   const fontId         = useResumeStore((s) => s.fontId);
-  const setContent     = useResumeStore((s) => s.setContent);
-  const setFocusLine   = useResumeStore((s) => s.setFocusLine);
   const resetKey       = useResumeStore((s) => s.resetKey);
 
   const cfg = MODE_CONFIG[mode];
-  const outerRef  = useRef<HTMLDivElement>(null);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
-
-  const [scale,     setScale]     = useState(0.7);
-  const [pageCount, setPageCount] = useState(1);
-  const [clickInfo, setClickInfo] = useState<ClickInfo | null>(null);
 
   const docHTML = useMemo(() => {
-    if (mode === "markdown") return buildResumeDocument(content, mode, markdownTheme, fontId);
-    if (mode === "latex")    return buildResumeDocument(content, mode, latexTheme, fontId);
+    if (mode === "markdown") return buildResumeDocument(content, mode, markdownTheme, fontId, templateLayout);
+    if (mode === "latex")    return buildResumeDocument(content, mode, latexTheme, fontId, templateLayout);
     return buildResumeDocument(content, mode, undefined, fontId);
-  }, [content, mode, markdownTheme, latexTheme, fontId]);
+  }, [content, mode, markdownTheme, latexTheme, fontId, templateLayout]);
 
   const updateScale = useCallback(() => {
     if (!outerRef.current) return;
-    setScale((outerRef.current.clientWidth - 48) / A4_WIDTH);
+    setScale((outerRef.current.clientWidth - 48) / A4_WIDTH_PX);
   }, []);
 
   useEffect(() => {
@@ -58,7 +52,7 @@ export default function PreviewPane({
         const body = iframeRef.current?.contentDocument?.body;
         if (body) {
           const h = body.scrollHeight;
-          if (h > 100) setPageCount(Math.ceil(Math.max(A4_HEIGHT, h) / A4_HEIGHT));
+          if (h > 100) setPageCount(Math.ceil(Math.max(A4_HEIGHT_PX, h) / A4_HEIGHT_PX));
         }
       } catch {}
     }, 300);
@@ -72,102 +66,16 @@ export default function PreviewPane({
     }
   }, [exporting, setExportingAction]);
 
-  useEffect(() => {
-    const el = outerRef.current;
-    if (!el) return;
-    const close = () => {
-      setClickInfo(null);
-      iframeRef.current?.contentWindow?.postMessage({ type: "rf-deselect" }, "*");
-    };
-    el.addEventListener("scroll", close);
-    return () => el.removeEventListener("scroll", close);
-  }, []);
-
-  useEffect(() => {
-    const handler = (e: MessageEvent) => {
-      if (!e.data) return;
-
-      if (e.data.type === "rf-close") {
-        setClickInfo(null);
-        iframeRef.current?.contentWindow?.postMessage({ type: "rf-deselect" }, "*");
-        return;
-      }
-
-      if (e.data.type !== "rf-click") return;
-      const iframeRect = iframeRef.current?.getBoundingClientRect();
-      const canvasRect = outerRef.current?.getBoundingClientRect();
-      if (!iframeRect || !canvasRect) return;
-      const rawX  = iframeRect.left + e.data.x * scale;
-      const pageX = Math.max(canvasRect.left, rawX);
-      const pageY = iframeRect.top  + e.data.y * scale;
-      setClickInfo({
-        elIdx:    e.data.elIdx,
-        tag:      e.data.tag,
-        text:     e.data.text,
-        pageX,
-        pageY,
-        computed: e.data.computed,
-      });
-    };
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
-  }, [scale]);
-
-  const handleStyleChange = useCallback(
-    (elIdx: string, styles: Record<string, string>) => {
-      iframeRef.current?.contentWindow?.postMessage(
-        { type: "rf-style", elIdx, styles },
-        "*"
-      );
-    },
-    []
-  );
-
-  const handleStyleCommit = useCallback(
-    (_elIdx: string, styles: Record<string, string>) => {
-      if (!clickInfo) return;
-      setContent(applyStyleToSource(content, mode, clickInfo.text, styles));
-      setClickInfo(null);
-    },
-    [content, mode, clickInfo, setContent]
-  );
-
-  const handleTextChange = useCallback(
-    (elIdx: string, oldText: string, newText: string) => {
-      setContent(replaceTextInSource(content, oldText, newText));
-      setClickInfo(null);
-    },
-    [content, setContent]
-  );
-
-  const handleGoToCode = useCallback(
-    (text: string) => {
-      if (!text.trim()) return;
-      const search = text.trim().slice(0, 60);
-      const lines = content.split("\n");
-      const idx = lines.findIndex((l) => l.includes(search));
-      setFocusLine(idx >= 0 ? idx + 1 : 1);
-      setClickInfo(null);
-    },
-    [content, setFocusLine]
-  );
-
-  const handleClose = useCallback(() => {
-    iframeRef.current?.contentWindow?.postMessage({ type: "rf-deselect" }, "*");
-    setClickInfo(null);
-  }, []);
-
-  const totalPaperH = pageCount * A4_HEIGHT;
+  const totalPaperH = pageCount * A4_HEIGHT_PX;
 
   const breakLines = useMemo(() => {
     const lines: number[] = [];
-    for (let i = 1; i < pageCount; i++) lines.push(i * A4_HEIGHT);
+    for (let i = 1; i < pageCount; i++) lines.push(i * A4_HEIGHT_PX);
     return lines;
   }, [pageCount]);
 
   return (
     <div className="flex flex-col min-w-0 flex-1">
-      {/* Header */}
       <div
         className={`flex items-center justify-between px-4 py-1.5 ${shell.bgSubtle} border-b ${shell.border} shrink-0`}
       >
@@ -196,7 +104,6 @@ export default function PreviewPane({
         </span>
       </div>
 
-      {/* Canvas */}
       <div
         ref={outerRef}
         className={`flex-1 overflow-auto ${canvas.bg}`}
@@ -208,7 +115,7 @@ export default function PreviewPane({
         }
       >
         <div className="py-6 flex justify-center">
-          <div className="relative shrink-0 w-[calc(794px*var(--scale))] h-[calc(var(--total-h)*var(--scale))]">
+          <div className="relative shrink-0 overflow-hidden w-[calc(794px*var(--scale))] h-[calc(var(--total-h)*var(--scale))]">
             <div
               className={`absolute inset-0 ${canvas.paperBg} rounded-sm ${canvas.paperShadow}`}
             />
@@ -249,17 +156,6 @@ export default function PreviewPane({
           </div>
         </div>
       </div>
-
-      {clickInfo && (
-        <FloatingStyleBar
-          info={clickInfo}
-          onStyleChange={handleStyleChange}
-          onStyleCommit={handleStyleCommit}
-          onTextChange={handleTextChange}
-          onGoToCode={handleGoToCode}
-          onClose={handleClose}
-        />
-      )}
     </div>
   );
 }
