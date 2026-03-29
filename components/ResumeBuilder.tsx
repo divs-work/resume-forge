@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { shell } from "@/constant/theme";
+import type { SelectedEl } from "@/types/resume";
 import Toolbar from "./Toolbar";
 import ATSPanel from "./ATSPanel";
 import TemplatesPanel from "./TemplatesPanel";
@@ -9,9 +10,13 @@ import EditorPane from "./EditorPane";
 import PreviewPane from "./PreviewPane";
 
 export default function ResumeBuilder() {
-  const [showATS, setShowATS] = useState(false);
+  const [showATS, setShowATS]       = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
-  const [exporting, setExporting] = useState(false);
+  const [exporting, setExporting]   = useState(false);
+  const [focusLine, setFocusLine]   = useState<number | null>(null);
+  const [selectedEl, setSelectedEl] = useState<SelectedEl | null>(null);
+
+  const handleCloseStylePanel = () => setSelectedEl(null);
 
   const handleCloseAll = () => {
     setShowATS(false);
@@ -43,14 +48,15 @@ export default function ResumeBuilder() {
         onToggleTemplates={handleToggleTemplates}
         exporting={exporting}
         onExport={handleExport}
+        onCloseStylePanel={handleCloseStylePanel}
       />
 
       {showATS && <ATSPanel />}
       {showTemplates && <TemplatesPanel />}
 
       <div className="flex flex-1 overflow-hidden min-h-0">
-        <EditorPane />
-        <PreviewPane exporting={exporting} setExportingAction={setExporting} />
+        <EditorPane focusLine={focusLine} onFocusLineHandled={() => setFocusLine(null)} onCloseStylePanel={handleCloseStylePanel} />
+        <PreviewPane exporting={exporting} setExportingAction={setExporting} setFocusLine={setFocusLine} selectedEl={selectedEl} setSelectedEl={setSelectedEl} />
       </div>
     </div>
   );

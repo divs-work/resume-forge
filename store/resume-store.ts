@@ -13,7 +13,6 @@ interface ResumeState {
   markdownTheme: ResumeTheme;
   templateLayout: TemplateLayout;
   fontId: string;
-  focusLine: number | null;
   resetKey: number;
 }
 
@@ -24,7 +23,6 @@ interface ResumeActions {
   setMarkdownTheme: (theme: ResumeTheme) => void;
   setTemplateLayout: (layout: Partial<TemplateLayout>) => void;
   setFontId: (fontId: string) => void;
-  setFocusLine: (line: number | null) => void;
   resetTemplate: () => void;
 }
 
@@ -39,7 +37,6 @@ export const useResumeStore = create<ResumeStore>()(
       markdownTheme: DEFAULT_MD_THEME,
       templateLayout: { ...DEFAULT_TEMPLATE_LAYOUT },
       fontId: "",
-      focusLine: null,
       resetKey: 0,
 
       setMode: (mode) => set({ mode }),
@@ -56,8 +53,6 @@ export const useResumeStore = create<ResumeStore>()(
       setTemplateLayout: (layout) =>
         set((state) => ({ templateLayout: { ...state.templateLayout, ...layout } })),
       setFontId: (fontId) => set({ fontId }),
-      setFocusLine: (line) => set({ focusLine: line }),
-
       resetTemplate: () => {
         const { mode } = get();
         set((state) => ({
