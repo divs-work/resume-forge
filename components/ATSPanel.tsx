@@ -49,21 +49,26 @@ function Tooltip({ label, tip }: { label: string; tip: string }) {
 
 function Badge({ check }: { check: ATSCheck }) {
   const [show, setShow] = useState(false);
+
+  const handleMouseEnter = () => { if (!check.pass) setShow(true); };
+  const handleMouseLeave = () => setShow(false);
+
+  const badgeCls = check.pass
+    ? `${atsBadge.passBg} ${atsBadge.passText} ${atsBadge.passBorder}`
+    : `${atsBadge.failBg} ${atsBadge.failText} ${atsBadge.failBorder} ${atsBadge.failHover}`;
+  const dotCls = check.pass ? atsBadge.passDot : atsBadge.failDot;
+
   return (
     <div
       className="relative inline-flex"
-      onMouseEnter={() => !check.pass && setShow(true)}
-      onMouseLeave={() => setShow(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       <span
-        className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-full font-medium border select-none transition-colors ${
-          check.pass
-            ? `${atsBadge.passBg} ${atsBadge.passText} ${atsBadge.passBorder}`
-            : `${atsBadge.failBg} ${atsBadge.failText} ${atsBadge.failBorder} ${atsBadge.failHover}`
-        }`}
+        className={`inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-full font-medium border select-none transition-colors ${badgeCls}`}
       >
         <span
-          className={`size-1.5 rounded-full shrink-0 ${check.pass ? atsBadge.passDot : atsBadge.failDot}`}
+          className={`size-1.5 rounded-full shrink-0 ${dotCls}`}
         />
         {check.label}
       </span>
@@ -163,7 +168,6 @@ export default function ATSPanel() {
   return (
     <div className={`border-b shrink-0 ${shell.bg} ${shell.border}`}>
       <div className="flex items-start gap-5 px-5 py-3">
-        {/* Score */}
         <div className="flex flex-col items-center gap-1 shrink-0 pt-1">
           <div className="relative">
             <svg
@@ -205,7 +209,6 @@ export default function ATSPanel() {
 
         <div className="w-px self-stretch bg-gray-100 shrink-0" />
 
-        {/* Categories */}
         <div className="flex-1 min-w-0 grid grid-cols-4 gap-x-6 gap-y-3 py-1">
           {byCategory.map((cat) => (
             <CategoryCard key={cat.name} {...cat} />

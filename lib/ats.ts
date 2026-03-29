@@ -1,4 +1,6 @@
-import type { ATSCheck, ATSResult } from "@/types/resume";
+import type { ATSCheck } from "@/types/resume";
+
+interface ATSResult { checks: ATSCheck[]; score: number; }
 
 /*
  * ResumeForge ATS Checker v3 — 2026 Edition

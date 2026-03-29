@@ -1,8 +1,7 @@
 "use client";
 import createDOMPurify from "dompurify";
-import { Marked, Renderer } from "marked";
-import type { Tokens } from "marked";
-import { ResumeTheme } from "@/types/resume";
+import { Marked, Renderer, type Tokens } from "marked";
+import type { ResumeTheme } from "@/types/resume";
 
 /* ═══════════════════════ HTML SANITIZER ═══════════════════════ */
 
@@ -78,20 +77,16 @@ export function parseMarkdown(md: string, theme: ResumeTheme): string {
 
 export function parseLatex(tex: string, theme: ResumeTheme): string {
   try {
-    // ── 1. Extract document body ────────────────────────────────────────────
     const bodyMatch = tex.match(/\\begin\{document\}([\s\S]*?)\\end\{document\}/);
     let src = bodyMatch ? bodyMatch[1] : tex;
 
-    // ── 2. Strip LaTeX comment lines ────────────────────────────────────────
     src = src.replace(/^%[^\n]*/gm, "");
 
-    // ── 3. Preview style overrides (\rfstyle{css}{text}) ────────────────────
     src = src.replace(
       /\\rfstyle\{([^}]*)\}\{([^}]*)\}/g,
       '<span style="$1">$2</span>'
     );
 
-    // ── 4. Escape LaTeX special characters ──────────────────────────────────
     src = src
       .replace(/\\&/g, "&amp;")
       .replace(/\\%/g, "%")
@@ -103,7 +98,6 @@ export function parseLatex(tex: string, theme: ResumeTheme): string {
       .replace(/---/g, "—")
       .replace(/--/g, "–");
 
-    // ── 5. Inline math — strip or convert simple tokens ─────────────────────
     src = src
       .replace(/\\\$/g, "&#36;")
       .replace(/\$\s*\|\s*\$/g, " | ")
@@ -112,13 +106,11 @@ export function parseLatex(tex: string, theme: ResumeTheme): string {
       .replace(/\$\s*\\textbullet\s*\$/g, "•")
       .replace(/\$[^$\n]*\$/g, "");
 
-    // ── 6. center environment ────────────────────────────────────────────────
     src = src.replace(
       /\\begin\{center\}([\s\S]*?)\\end\{center\}/g,
       (_, inner) => `<div class="text-center mb-4">${inner.trim()}</div>`
     );
 
-    // ── 7. Inline font/size groups: {\Huge\bfseries text} ───────────────────
     src = src.replace(
       /\{((?:\\(?:Huge|huge|LARGE|Large|large|small|footnotesize|scriptsize|tiny|normalsize|bfseries|mdseries|itshape|upshape)\s*)+)((?:[^{}]|\\.)*?)\}/g,
       (_, cmds, content) => {
@@ -138,20 +130,17 @@ export function parseLatex(tex: string, theme: ResumeTheme): string {
       }
     );
 
-    // ── 8. Section commands ──────────────────────────────────────────────────
     src = src.replace(
       /\\rsection\{([^}]*)\}/g,
       `<h2 class="${theme.h2}">$1</h2>`
     );
 
-    // ── 9. Custom job entry ──────────────────────────────────────────────────
     src = src.replace(
       /\\rjob\{([^}]*)\}\{([^}]*)\}\{([^}]*)\}/g,
       `<h3 class="${theme.h3}">$1 <span class="font-normal text-sm ml-2">$3</span></h3>` +
       `<h4 class="${theme.h4}">$2</h4>`
     );
 
-    // ── 10. Standard formatting ──────────────────────────────────────────────
     src = src
       .replace(/\\textbf\{([^}]*)\}/g,              `<strong class="${theme.strong}">$1</strong>`)
       .replace(/\\textit\{([^}]*)\}/g,              `<em class="${theme.em}">$1</em>`)
@@ -161,7 +150,7 @@ export function parseLatex(tex: string, theme: ResumeTheme): string {
       .replace(/\\url\{([^}]*)\}/g,                 `<a href="$1" class="${theme.a}">$1</a>`)
       .replace(/\\rule\{[^}]*\}\{[^}]*\}/g,         `<hr class="${theme.hr}"/>`);
 
-    // ── 11. Tables (before \\ → <br> so row separators still work) ──────────
+    // tables must be converted before \\ → <br> so row separators still work
     src = src.replace(
       /\\begin\{tabular\}\{[^}]*\}([\s\S]*?)\\end\{tabular\}/g,
       (_, body) => {
@@ -189,7 +178,6 @@ export function parseLatex(tex: string, theme: ResumeTheme): string {
       }
     );
 
-    // ── 12. Lists ────────────────────────────────────────────────────────────
     src = src
       .replace(/\\begin\{itemize\}(?:\[[^\]]*\])?/g,   `<ul class="${theme.ul}">`)
       .replace(/\\end\{itemize\}/g,                      "</ul>")
@@ -200,29 +188,21 @@ export function parseLatex(tex: string, theme: ResumeTheme): string {
       `<li class="${theme.li}">$1</li>`
     );
 
-    // ── 13. Strip layout / spacing commands ──────────────────────────────────
     src = src.replace(
       /\\(?:pagestyle|thispagestyle|geometry|fancyhf|lhead|rhead|cfoot|lfoot|rfoot|renewcommand|setlength|vspace\*?|hspace\*?|noindent|newpage|clearpage|centering|raggedright|raggedleft|linewidth|textwidth|hfill|hrulefill|dotfill|medskip|smallskip|bigskip|vfill|parindent|parskip)\b(?:\{[^}]*\}){0,2}/g,
       ""
     );
 
-    // ── 14. Line breaks: \\ → <br> ───────────────────────────────────────────
     src = src.replace(/\\\\(?:\[[^\]]*\])?/g, "<br>");
 
-    // ── 15. Strip remaining LaTeX commands ───────────────────────────────────
-    // Multi-arg → join arg text
     src = src.replace(/\\[a-zA-Z]+\*?(?:\{[^}]*\}){2,}/g, (m) =>
       (m.match(/\{([^}]*)\}/g) ?? []).map((g) => g.slice(1, -1)).join(" ")
     );
-    // Single-arg → keep arg text
     src = src.replace(/\\[a-zA-Z]+\*?\{([^}]*)\}/g, "$1");
-    // No-arg → strip
     src = src.replace(/\\[a-zA-Z]+\*?\b/g, "");
 
-    // ── 16. Strip remaining braces ───────────────────────────────────────────
     src = src.replace(/[{}]/g, "");
 
-    // ── 17. Paragraph blocks ─────────────────────────────────────────────────
     src = src.replace(/\r\n/g, "\n");
     const html = src
       .split(/\n{2,}/)

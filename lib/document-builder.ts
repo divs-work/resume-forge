@@ -1,7 +1,8 @@
-import type { EditorMode, ResumeTheme } from "@/types/resume";
+import type { EditorMode, ResumeTheme, TemplateLayout } from "@/types/resume";
 import { FONTS, FONT_IMPORTS } from "@/constant/fonts";
 import { parseMarkdown, parseLatex, sanitizeHTML } from "@/lib/parsers";
 import { FONT_OPTIONS } from "@/constant/style-options";
+import { A4_WIDTH_MM, DEFAULT_TEMPLATE_LAYOUT } from "@/constant/config";
 
 // Tailwind variant prefixes that don't apply in a static iframe/print context
 const STRIP_VARIANTS =
@@ -103,7 +104,8 @@ export function buildResumeDocument(
   rawContent: string,
   mode: EditorMode,
   theme?: ResumeTheme,
-  fontId?: string
+  fontId?: string,
+  layout?: TemplateLayout
 ): string {
   let body: string;
   if (mode === "latex") {
@@ -117,8 +119,13 @@ export function buildResumeDocument(
   body = injectElementIds(body);
 
   const overrideFont = fontId ? FONT_OPTIONS.find((f) => f.id === fontId) : null;
-  const fontUrl = overrideFont?.importUrl ?? FONT_IMPORTS[mode];
-  const fontFamily = overrideFont?.family ?? FONTS[mode];
+  const fontUrl    = overrideFont?.importUrl ?? FONT_IMPORTS[mode];
+  const fontFamily = overrideFont?.family    ?? FONTS[mode];
+  // Tailwind utility classes (font-serif, font-sans, font-mono) override body font-family.
+  // When the user picks a custom font, force it on every element.
+  const fontOverrideCSS = overrideFont
+    ? `* { font-family: ${fontFamily} !important; }`
+    : "";
 
   const tailwindScript = `<script src="https://cdn.tailwindcss.com"><\/script>`;
 
@@ -142,7 +149,7 @@ ${CLICK_SCRIPT}
   body {
     font-family: ${fontFamily};
     font-size: 11pt;
-    line-height: 1.5;
+    line-height: ${layout?.lineHeight ?? DEFAULT_TEMPLATE_LAYOUT.lineHeight};
     color: #000;
     background: #fff;
     margin: 0;
@@ -153,6 +160,7 @@ ${CLICK_SCRIPT}
     print-color-adjust: exact;
   }
 
+  ${fontOverrideCSS}
   a { color: #1a5fb4; text-decoration: none; }
   img { max-width: 100%; height: auto; }
 
@@ -181,7 +189,12 @@ ${CLICK_SCRIPT}
 <body>${
     mode === "html"
       ? body
-      : `<div style="width:174mm;margin:0 auto;padding:18mm 0">${body}</div>`
+      : (() => {
+          const marginMm  = layout?.marginMm  ?? DEFAULT_TEMPLATE_LAYOUT.marginMm;
+          const paddingMm = layout?.paddingMm ?? DEFAULT_TEMPLATE_LAYOUT.paddingMm;
+          const widthMm   = A4_WIDTH_MM - 2 * marginMm;
+          return `<div style="width:${widthMm}mm;margin:0 auto;padding:${paddingMm}mm 0">${body}</div>`;
+        })()
   }</body>
 </html>`;
 }
