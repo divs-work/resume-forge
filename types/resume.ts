@@ -39,3 +39,10 @@ export interface TemplateLayout {
 }
 
 export type EditorMode = "latex" | "markdown" | "html";
+
+export interface SelectedEl {
+  elIdx: string;
+  text: string;
+  computedColor: string;
+  computedFontSize: string;
+}

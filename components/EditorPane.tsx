@@ -5,19 +5,25 @@ import { MODE_CONFIG } from "@/constant/config";
 import { editor, modeBg } from "@/constant/theme";
 import CodeEditor from "./CodeEditor";
 
-export default function EditorPane() {
-  const mode         = useResumeStore((s) => s.mode);
-  const content      = useResumeStore((s) => s.content[s.mode]);
-  const setContent   = useResumeStore((s) => s.setContent);
-  const focusLine    = useResumeStore((s) => s.focusLine);
-  const setFocusLine = useResumeStore((s) => s.setFocusLine);
+export default function EditorPane({
+  focusLine,
+  onFocusLineHandled,
+  onCloseStylePanel,
+}: {
+  focusLine: number | null;
+  onFocusLineHandled: () => void;
+  onCloseStylePanel: () => void;
+}) {
+  const mode       = useResumeStore((s) => s.mode);
+  const content    = useResumeStore((s) => s.content[s.mode]);
+  const setContent = useResumeStore((s) => s.setContent);
 
   const cfg       = MODE_CONFIG[mode];
   const lineCount = content.split("\n").length;
   const charCount = content.length;
 
   return (
-    <div className="flex flex-col min-w-0 flex-1">
+    <div onClick={onCloseStylePanel} className="flex flex-col min-w-0 flex-1">
       <div className={`shrink-0 ${editor.barBg} border-b ${editor.border}`}>
         <div className="flex items-center justify-between">
           <div
@@ -41,7 +47,7 @@ export default function EditorPane() {
           onChange={setContent}
           mode={mode}
           focusLine={focusLine}
-          onFocusLineHandled={() => setFocusLine(null)}
+          onFocusLineHandled={onFocusLineHandled}
         />
       </div>
     </div>

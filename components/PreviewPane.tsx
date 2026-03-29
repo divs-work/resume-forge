@@ -5,13 +5,21 @@ import { useResumeStore } from "@/store/resume-store";
 import { MODE_CONFIG, A4_WIDTH_PX, A4_HEIGHT_PX } from "@/constant/config";
 import { buildResumeDocument } from "@/lib/document-builder";
 import { shell, canvas } from "@/constant/theme";
+import StylePanel from "./StylePanel";
+import type { SelectedEl } from "@/types/resume";
 
 export default function PreviewPane({
   exporting,
   setExportingAction,
+  setFocusLine,
+  selectedEl,
+  setSelectedEl,
 }: {
   exporting: boolean;
   setExportingAction: (n: boolean) => void;
+  setFocusLine: (line: number | null) => void;
+  selectedEl: SelectedEl | null;
+  setSelectedEl: (el: SelectedEl | null) => void;
 }) {
   const [scale,     setScale]     = useState(0.7);
   const [pageCount, setPageCount] = useState(1);
@@ -41,9 +49,11 @@ export default function PreviewPane({
   }, []);
 
   useEffect(() => {
+    if (!outerRef.current) return;
     updateScale();
-    window.addEventListener("resize", updateScale);
-    return () => window.removeEventListener("resize", updateScale);
+    const ro = new ResizeObserver(updateScale);
+    ro.observe(outerRef.current);
+    return () => ro.disconnect();
   }, [updateScale]);
 
   useEffect(() => {
@@ -66,6 +76,30 @@ export default function PreviewPane({
     }
   }, [exporting, setExportingAction]);
 
+  useEffect(() => {
+    function handleMessage(e: MessageEvent) {
+      if (!e.data) return;
+      if (e.data.type === "rf-click") {
+        setSelectedEl({
+          elIdx: e.data.elIdx,
+          text: e.data.text,
+          computedColor: e.data.computed.color,
+          computedFontSize: e.data.computed.fontSize,
+        });
+      }
+      if (e.data.type === "rf-close") {
+        setSelectedEl(null);
+      }
+    }
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+  function handleClosePanel() {
+    iframeRef.current?.contentWindow?.postMessage({ type: "rf-deselect" }, "*");
+    setSelectedEl(null);
+  }
+
   const totalPaperH = pageCount * A4_HEIGHT_PX;
 
   const breakLines = useMemo(() => {
@@ -75,7 +109,8 @@ export default function PreviewPane({
   }, [pageCount]);
 
   return (
-    <div className="flex flex-col min-w-0 flex-1">
+    <div className="flex min-w-0 flex-1">
+      <div className="flex flex-col min-w-0 flex-1">
       <div
         className={`flex items-center justify-between px-4 py-1.5 ${shell.bgSubtle} border-b ${shell.border} shrink-0`}
       >
@@ -156,6 +191,16 @@ export default function PreviewPane({
           </div>
         </div>
       </div>
+      </div>
+      {selectedEl && (
+        <StylePanel
+          key={selectedEl.elIdx}
+          selected={selectedEl}
+          iframeRef={iframeRef}
+          onClose={handleClosePanel}
+          setFocusLine={setFocusLine}
+        />
+      )}
     </div>
   );
 }

@@ -15,6 +15,7 @@ interface ToolbarProps {
   onToggleTemplates: () => void;
   exporting: boolean;
   onExport: () => void;
+  onCloseStylePanel: () => void;
 }
 
 export default function Toolbar({
@@ -24,6 +25,7 @@ export default function Toolbar({
   onToggleTemplates,
   exporting,
   onExport,
+  onCloseStylePanel,
 }: ToolbarProps) {
   const mode = useResumeStore((s) => s.mode);
   const setMode = useResumeStore((s) => s.setMode);
@@ -50,6 +52,7 @@ export default function Toolbar({
 
   return (
     <div
+      onClick={onCloseStylePanel}
       className={`flex items-center justify-between px-4 py-2 ${shell.bg} border-b ${shell.border} gap-2 flex-wrap shrink-0`}
     >
       <div className="flex items-center gap-2.5">
