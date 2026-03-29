@@ -2,7 +2,15 @@
 
 import { useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { useResumeStore } from "@/store/resumeStore";
-import { MODE_CONFIG, A4_WIDTH_PX, A4_HEIGHT_PX } from "@/constants/config";
+import {
+  MODE_CONFIG,
+  A4_WIDTH_PX,
+  A4_HEIGHT_PX,
+  PREVIEW_INITIAL_SCALE,
+  PREVIEW_CONTAINER_PADDING,
+  PREVIEW_MIN_BODY_HEIGHT,
+  PREVIEW_POLL_MS,
+} from "@/constants/config";
 import { buildResumeDocument } from "@/helper/documentBuilder";
 import { shell, canvas } from "@/constants/theme";
 import StylePanel from "./StylePanel";
@@ -14,14 +22,16 @@ export default function PreviewPane({
   setFocusLine,
   selectedEl,
   setSelectedEl,
+  onCloseAll,
 }: {
   exporting: boolean;
   onExportDone: (n: boolean) => void;
   setFocusLine: (line: number | null) => void;
   selectedEl: SelectedEl | null;
-  setSelectedEl: (el: SelectedEl | null) => void;
+  setSelectedEl: (el: SelectedEl) => void;
+  onCloseAll: () => void;
 }) {
-  const [scale,     setScale]     = useState(0.7);
+  const [scale,     setScale]     = useState(PREVIEW_INITIAL_SCALE);
   const [pageCount, setPageCount] = useState(1);
 
   const outerRef  = useRef<HTMLDivElement>(null);
@@ -45,7 +55,7 @@ export default function PreviewPane({
 
   const updateScale = useCallback(() => {
     if (!outerRef.current) return;
-    setScale((outerRef.current.clientWidth - 48) / A4_WIDTH_PX);
+    setScale((outerRef.current.clientWidth - PREVIEW_CONTAINER_PADDING) / A4_WIDTH_PX);
   }, []);
 
   useEffect(() => {
@@ -62,10 +72,10 @@ export default function PreviewPane({
         const body = iframeRef.current?.contentDocument?.body;
         if (body) {
           const h = body.scrollHeight;
-          if (h > 100) setPageCount(Math.ceil(Math.max(A4_HEIGHT_PX, h) / A4_HEIGHT_PX));
+          if (h > PREVIEW_MIN_BODY_HEIGHT) setPageCount(Math.ceil(Math.max(A4_HEIGHT_PX, h) / A4_HEIGHT_PX));
         }
       } catch {}
-    }, 300);
+    }, PREVIEW_POLL_MS);
     return () => clearInterval(poll);
   }, [docHTML]);
 
@@ -88,7 +98,7 @@ export default function PreviewPane({
         });
       }
       if (e.data.type === "rf-close") {
-        setSelectedEl(null);
+        onCloseAll();
       }
     }
     window.addEventListener("message", handleMessage);
@@ -97,7 +107,7 @@ export default function PreviewPane({
 
   function handleClosePanel() {
     iframeRef.current?.contentWindow?.postMessage({ type: "rf-deselect" }, "*");
-    setSelectedEl(null);
+    onCloseAll();
   }
 
   const totalPaperH = pageCount * A4_HEIGHT_PX;

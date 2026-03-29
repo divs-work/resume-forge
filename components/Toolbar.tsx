@@ -3,7 +3,12 @@
 import { useMemo, type ChangeEvent } from "react";
 import { useResumeStore } from "@/store/resumeStore";
 import { checkAts } from "@/helper/ats";
-import { MODE_CONFIG } from "@/constants/config";
+import {
+  MODE_CONFIG,
+  MARGIN_MM_MIN, MARGIN_MM_MAX,
+  PADDING_MM_MIN, PADDING_MM_MAX,
+  LINE_HEIGHT_MIN, LINE_HEIGHT_MAX, LINE_HEIGHT_STEP,
+} from "@/constants/config";
 import type { EditorMode } from "@/types/resume";
 import { shell, modeBg, toolbar } from "@/constants/theme";
 import { FONT_OPTIONS } from "@/constants/styleOptions";
@@ -346,7 +351,7 @@ export default function Toolbar({
             <div className="flex items-center gap-1.5">
               <span className={`text-[10px] ${shell.textFaint} whitespace-nowrap`}>Margin</span>
               <input
-                type="number" min={5} max={40}
+                type="number" min={MARGIN_MM_MIN} max={MARGIN_MM_MAX}
                 value={templateLayout.marginMm}
                 onChange={handleMarginChange}
                 className={`w-10 px-1 py-1 rounded text-[11px] text-center ${shell.bgMuted} ${shell.textMuted} border-none outline-none`}
@@ -354,7 +359,7 @@ export default function Toolbar({
               <span className={`text-[10px] ${shell.textFaint}`}>mm</span>
               <span className={`text-[10px] ${shell.textFaint} whitespace-nowrap ml-1`}>Pad</span>
               <input
-                type="number" min={5} max={40}
+                type="number" min={PADDING_MM_MIN} max={PADDING_MM_MAX}
                 value={templateLayout.paddingMm}
                 onChange={handlePaddingChange}
                 className={`w-10 px-1 py-1 rounded text-[11px] text-center ${shell.bgMuted} ${shell.textMuted} border-none outline-none`}
@@ -362,7 +367,7 @@ export default function Toolbar({
               <span className={`text-[10px] ${shell.textFaint}`}>mm</span>
               <span className={`text-[10px] ${shell.textFaint} whitespace-nowrap ml-1`}>Spacing</span>
               <input
-                type="number" min={1} max={3} step={0.1}
+                type="number" min={LINE_HEIGHT_MIN} max={LINE_HEIGHT_MAX} step={LINE_HEIGHT_STEP}
                 value={templateLayout.lineHeight}
                 onChange={handleSpacingChange}
                 className={`w-12 px-1 py-1 rounded text-[11px] text-center ${shell.bgMuted} ${shell.textMuted} border-none outline-none`}

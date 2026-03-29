@@ -2,7 +2,12 @@
 
 import { useEffect, useRef } from "react";
 import { EditorView, basicSetup } from "codemirror";
-import { EditorState, Compartment, StateEffect, StateField } from "@codemirror/state";
+import {
+  EditorState,
+  Compartment,
+  StateEffect,
+  StateField,
+} from "@codemirror/state";
 import { Decoration } from "@codemirror/view";
 import type { DecorationSet, Extension } from "@codemirror/view";
 import { html } from "@codemirror/lang-html";
@@ -11,9 +16,16 @@ import { StreamLanguage } from "@codemirror/language";
 import { stex } from "@codemirror/legacy-modes/mode/stex";
 import { oneDark } from "@codemirror/theme-one-dark";
 import type { EditorMode } from "@/types/resume";
+import {
+  EDITOR_COLORS,
+  EDITOR_FONT_SIZE,
+  EDITOR_LINE_HEIGHT,
+  EDITOR_CONTENT_PADDING,
+  LINE_HIGHLIGHT_MS,
+} from "@/constants/config";
 
 const highlightLineEffect = StateEffect.define<number | null>();
-const highlightLineMark   = Decoration.line({ class: "cm-goto-line" });
+const highlightLineMark = Decoration.line({ class: "cm-goto-line" });
 
 const highlightLineField = StateField.define<DecorationSet>({
   create: () => Decoration.none,
@@ -40,32 +52,42 @@ interface Props {
 }
 
 const CARET: Record<string, string> = {
-  markdown: "#3b82f6",
-  html:     "#f97316",
-  latex:    "#ef4444",
+  markdown: EDITOR_COLORS.caretMarkdown,
+  html:     EDITOR_COLORS.caretHtml,
+  latex:    EDITOR_COLORS.caretLatex,
 };
 
 function langFor(mode: EditorMode): Extension {
-  if (mode === "html")     return html();
+  if (mode === "html") return html();
   if (mode === "markdown") return markdown();
   return StreamLanguage.define(stex);
 }
 
-export default function CodeEditor({ value, onChange, mode, focusLine, onFocusLineHandled }: Props) {
+export default function CodeEditor({
+  value,
+  onChange,
+  mode,
+  focusLine,
+  onFocusLineHandled,
+}: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const viewRef      = useRef<EditorView | null>(null);
-  const langCompRef     = useRef(new Compartment());
-  const onChangeRef  = useRef(onChange);
-  const modeRef      = useRef(mode);
-  const skipNextRef     = useRef(false);
+  const viewRef = useRef<EditorView | null>(null);
+  const langCompRef = useRef(new Compartment());
+  const onChangeRef = useRef(onChange);
+  const modeRef = useRef(mode);
+  const skipNextRef = useRef(false);
 
-  useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
-  useEffect(() => { modeRef.current = mode; },         [mode]);
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
+  useEffect(() => {
+    modeRef.current = mode;
+  }, [mode]);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const caretColor = CARET[mode] ?? "#fff";
+    const caretColor = CARET[mode] ?? EDITOR_COLORS.caretFallback;
 
     const view = new EditorView({
       state: EditorState.create({
@@ -82,23 +104,23 @@ export default function CodeEditor({ value, onChange, mode, focusLine, onFocusLi
           }),
           EditorView.theme(
             {
-              "&":              { height: "100%" },
-              ".cm-editor":     { height: "100%" },
-              ".cm-scroller":   {
+              "&": { height: "100%" },
+              ".cm-editor": { height: "100%" },
+              ".cm-scroller": {
                 overflow:   "auto",
                 fontFamily: "var(--font-mono, ui-monospace, 'JetBrains Mono', monospace)",
-                fontSize:   "13px",
-                lineHeight: "1.7",
+                fontSize:   EDITOR_FONT_SIZE,
+                lineHeight: EDITOR_LINE_HEIGHT,
               },
-              ".cm-content":          { padding: "14px 0" },
+              ".cm-content":          { padding: EDITOR_CONTENT_PADDING },
               "&.cm-focused":         { outline: "none" },
-              ".cm-gutters":          { backgroundColor: "#0d1117", borderRight: "1px solid #30363d" },
-              ".cm-activeLineGutter": { backgroundColor: "#161b22" },
+              ".cm-gutters":          { backgroundColor: EDITOR_COLORS.gutterBg, borderRight: EDITOR_COLORS.gutterBorder },
+              ".cm-activeLineGutter": { backgroundColor: EDITOR_COLORS.activeLineGutter },
               ".cm-cursor, .cm-dropCursor": { borderLeftColor: caretColor },
               ".cm-goto-line": {
-                backgroundColor: "#1c3a5e",
-                borderLeft:      "3px solid #3b82f6",
-                boxShadow:       "inset 0 0 0 1px #2563eb22",
+                backgroundColor: EDITOR_COLORS.gotoLineBg,
+                borderLeft:      EDITOR_COLORS.gotoLineBorder,
+                boxShadow:       EDITOR_COLORS.gotoLineShadow,
               },
             },
             { dark: true }
@@ -114,7 +136,10 @@ export default function CodeEditor({ value, onChange, mode, focusLine, onFocusLi
     });
 
     viewRef.current = view;
-    return () => { view.destroy(); viewRef.current = null; };
+    return () => {
+      view.destroy();
+      viewRef.current = null;
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -139,7 +164,7 @@ export default function CodeEditor({ value, onChange, mode, focusLine, onFocusLi
     const view = viewRef.current;
     if (!focusLine || !view) return;
     const lineNo = Math.min(focusLine, view.state.doc.lines);
-    const line   = view.state.doc.line(lineNo);
+    const line = view.state.doc.line(lineNo);
     view.dispatch({
       selection: { anchor: line.from, head: line.from },
       effects: [
@@ -151,7 +176,7 @@ export default function CodeEditor({ value, onChange, mode, focusLine, onFocusLi
     onFocusLineHandled();
     const timer = setTimeout(() => {
       viewRef.current?.dispatch({ effects: highlightLineEffect.of(null) });
-    }, 2000);
+    }, LINE_HIGHLIGHT_MS);
     return () => clearTimeout(timer);
   }, [focusLine, onFocusLineHandled]);
 
