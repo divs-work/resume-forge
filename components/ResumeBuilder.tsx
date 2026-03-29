@@ -73,7 +73,7 @@ export default function ResumeBuilder() {
         onToggleHelp={handleToggleHelp}
         exporting={exporting}
         onExport={handleExport}
-        onCloseStylePanel={() => setSelectedEl(null)}
+        onCloseStylePanelAction={() => setSelectedEl(null)}
         onCloseAll={closeAll}
       />
 
@@ -82,7 +82,7 @@ export default function ResumeBuilder() {
       {showHelp && <HelpPanel />}
 
       <div className="flex flex-1 overflow-hidden min-h-0">
-        <EditorPane focusLine={focusLine} onFocusLineHandled={() => setFocusLine(null)} onCloseStylePanel={closeAll} />
+        <EditorPane focusLine={focusLine} onFocusLineHandledAction={() => setFocusLine(null)} onCloseStylePanelAction={closeAll} />
         <PreviewPane exporting={exporting} onExportDone={setExporting} setFocusLine={setFocusLine} selectedEl={selectedEl} setSelectedEl={handleOpenStylePanel} onCloseAll={closeAll} />
       </div>
     </div>

@@ -15,7 +15,7 @@ const TABS = [
 
 type TabId = typeof TABS[number]["id"];
 
-const SECTION_MAP: Record<Exclude<TabId, "general">, HelpSection> = {
+const SECTION_MAP: Record<Exclude<TabId, "general" | "ai">, HelpSection> = {
   markdown: MARKDOWN_HELP,
   latex:    LATEX_HELP,
   html:     HTML_HELP,

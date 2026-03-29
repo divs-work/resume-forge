@@ -22,7 +22,7 @@ interface ToolbarProps {
   onToggleHelp: () => void;
   exporting: boolean;
   onExport: () => void;
-  onCloseStylePanel: () => void;
+  onCloseStylePanelAction: () => void;
   onCloseAll: () => void;
 }
 
@@ -35,7 +35,7 @@ export default function Toolbar({
   onToggleHelp,
   exporting,
   onExport,
-  onCloseStylePanel,
+  onCloseStylePanelAction,
   onCloseAll,
 }: ToolbarProps) {
   const mode = useResumeStore((s) => s.mode);
@@ -66,7 +66,7 @@ export default function Toolbar({
 
   return (
     <div
-      onClick={onCloseStylePanel}
+      onClick={onCloseStylePanelAction}
       className={`flex items-center justify-between px-4 py-2 ${shell.bg} border-b ${shell.border} gap-2 flex-wrap shrink-0`}
     >
       <div className="flex items-center gap-2.5">

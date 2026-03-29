@@ -9,7 +9,8 @@ import {
   StateField,
 } from "@codemirror/state";
 import { Decoration } from "@codemirror/view";
-import type { DecorationSet, Extension } from "@codemirror/view";
+import type { DecorationSet } from "@codemirror/view";
+import type { Extension } from "@codemirror/state";
 import { html } from "@codemirror/lang-html";
 import { markdown } from "@codemirror/lang-markdown";
 import { StreamLanguage } from "@codemirror/language";
@@ -48,7 +49,7 @@ interface Props {
   onChange: (v: string) => void;
   mode: EditorMode;
   focusLine: number | null;
-  onFocusLineHandled: () => void;
+  onFocusLineHandledAction: () => void;
 }
 
 const CARET: Record<string, string> = {
@@ -68,7 +69,7 @@ export default function CodeEditor({
   onChange,
   mode,
   focusLine,
-  onFocusLineHandled,
+  onFocusLineHandledAction,
 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef = useRef<EditorView | null>(null);
@@ -191,12 +192,12 @@ export default function CodeEditor({
       ],
     });
     view.focus();
-    onFocusLineHandled();
+    onFocusLineHandledAction();
     const timer = setTimeout(() => {
       viewRef.current?.dispatch({ effects: highlightLineEffect.of(null) });
     }, LINE_HIGHLIGHT_MS);
     return () => clearTimeout(timer);
-  }, [focusLine, onFocusLineHandled]);
+  }, [focusLine, onFocusLineHandledAction]);
 
   return <div ref={containerRef} className="w-full h-full" />;
 }

@@ -7,12 +7,12 @@ import CodeEditor from "./CodeEditor";
 
 export default function EditorPane({
   focusLine,
-  onFocusLineHandled,
-  onCloseStylePanel,
+  onFocusLineHandledAction,
+  onCloseStylePanelAction,
 }: {
   focusLine: number | null;
-  onFocusLineHandled: () => void;
-  onCloseStylePanel: () => void;
+  onFocusLineHandledAction: () => void;
+  onCloseStylePanelAction: () => void;
 }) {
   const mode       = useResumeStore((s) => s.mode);
   const content    = useResumeStore((s) => s.content[s.mode]);
@@ -23,7 +23,7 @@ export default function EditorPane({
   const charCount = content.length;
 
   return (
-    <div onClick={onCloseStylePanel} className="flex flex-col min-w-0 flex-1">
+    <div onClick={onCloseStylePanelAction} className="flex flex-col min-w-0 flex-1">
       <div className={`shrink-0 ${editor.barBg} border-b ${editor.border}`}>
         <div className="flex items-center justify-between">
           <div
@@ -47,7 +47,7 @@ export default function EditorPane({
           onChange={setContent}
           mode={mode}
           focusLine={focusLine}
-          onFocusLineHandled={onFocusLineHandled}
+          onFocusLineHandledAction={onFocusLineHandledAction}
         />
       </div>
     </div>
