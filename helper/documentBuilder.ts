@@ -1,8 +1,8 @@
 import type { EditorMode, ResumeTheme, TemplateLayout } from "@/types/resume";
-import { FONTS, FONT_IMPORTS } from "@/constant/fonts";
-import { parseMarkdown, parseLatex, sanitizeHTML } from "@/lib/parsers";
-import { FONT_OPTIONS } from "@/constant/style-options";
-import { A4_WIDTH_MM, DEFAULT_TEMPLATE_LAYOUT } from "@/constant/config";
+import { FONTS, FONT_IMPORTS } from "@/constants/fonts";
+import { parseMarkdown, parseLatex, sanitizeHTML } from "@/helper/parsers";
+import { FONT_OPTIONS } from "@/constants/styleOptions";
+import { A4_WIDTH_MM, DEFAULT_TEMPLATE_LAYOUT } from "@/constants/config";
 
 // Tailwind variant prefixes that don't apply in a static iframe/print context
 const STRIP_VARIANTS =
@@ -62,7 +62,7 @@ const CLICK_HANDLER =
       `if(el.hasAttribute&&el.hasAttribute('data-rf-el')&&T[el.tagName.toLowerCase()])break;` +
       `el=el.parentElement;` +
     `}` +
-    `if(!el||el.tagName==='BODY'){window.parent.postMessage({type:'rf-close'},'*');return;}` +
+    `if(!el||el.tagName==='BODY'){if(sel){sel.style.outline='';sel.style.outlineOffset='';sel=null;}window.parent.postMessage({type:'rf-close'},'*');return;}` +
     `if(sel){sel.style.outline='';sel.style.outlineOffset='';}` +
     `sel=el;` +
     `el.style.outline='2px solid #3b82f6';` +
@@ -179,10 +179,11 @@ ${CLICK_SCRIPT}
       margin: 0;
       padding: 0;
       background: #fff;
-      overflow: visible;
+      overflow-x: hidden;
+      overflow-y: visible;
     }
     a { color: inherit !important; }
-    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; outline: none !important; max-width: 100%; }
   }
 </style>
 </head>

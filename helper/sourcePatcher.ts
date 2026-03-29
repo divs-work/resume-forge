@@ -32,13 +32,22 @@ function mergeInlineStyles(
     .join("; ");
 }
 
+// splits HTML on tag boundaries — even parts are text nodes, odd parts are tags
+function inTextNodes(source: string, replacer: (textNode: string) => string): string {
+  return source.split(/(<[^>]*>)/g).map((part, i) => i % 2 === 0 ? replacer(part) : part).join('');
+}
+
 // text replacement
 
 export function replaceTextInSource(
   source: string,
   oldText: string,
-  newText: string
+  newText: string,
+  mode?: EditorMode
 ): string {
+  if (mode === "html") {
+    return inTextNodes(source, (part) => part.split(oldText).join(newText));
+  }
   return source.split(oldText).join(newText);
 }
 
@@ -47,7 +56,8 @@ export function replaceTextInSource(
 export function applyStyleAsSpan(
   source: string,
   text: string,
-  styles: Record<string, string>
+  styles: Record<string, string>,
+  mode: EditorMode
 ): string {
   const escaped = escapeRegex(text);
 
@@ -61,6 +71,11 @@ export function applyStyleAsSpan(
   }
 
   const styleStr = cssString(styles);
+  if (mode === "html") {
+    return inTextNodes(source, (part) =>
+      part.replace(new RegExp(escaped, "g"), `<span style="${styleStr}">$&</span>`)
+    );
+  }
   return source.replace(
     new RegExp(`(${escaped})`, "g"),
     `<span style="${styleStr}">$1</span>`
@@ -97,5 +112,5 @@ export function applyStyleToSource(
   styles: Record<string, string>
 ): string {
   if (mode === "latex") return applyStyleAsLatexCmd(source, text, styles);
-  return applyStyleAsSpan(source, text, styles);
+  return applyStyleAsSpan(source, text, styles, mode);
 }

@@ -1,22 +1,22 @@
 "use client";
 
 import { useMemo, useRef, useEffect, useState, useCallback } from "react";
-import { useResumeStore } from "@/store/resume-store";
-import { MODE_CONFIG, A4_WIDTH_PX, A4_HEIGHT_PX } from "@/constant/config";
-import { buildResumeDocument } from "@/lib/document-builder";
-import { shell, canvas } from "@/constant/theme";
+import { useResumeStore } from "@/store/resumeStore";
+import { MODE_CONFIG, A4_WIDTH_PX, A4_HEIGHT_PX } from "@/constants/config";
+import { buildResumeDocument } from "@/helper/documentBuilder";
+import { shell, canvas } from "@/constants/theme";
 import StylePanel from "./StylePanel";
 import type { SelectedEl } from "@/types/resume";
 
 export default function PreviewPane({
   exporting,
-  setExportingAction,
+  onExportDone,
   setFocusLine,
   selectedEl,
   setSelectedEl,
 }: {
   exporting: boolean;
-  setExportingAction: (n: boolean) => void;
+  onExportDone: (n: boolean) => void;
   setFocusLine: (line: number | null) => void;
   selectedEl: SelectedEl | null;
   setSelectedEl: (el: SelectedEl | null) => void;
@@ -72,9 +72,9 @@ export default function PreviewPane({
   useEffect(() => {
     if (exporting) {
       iframeRef.current?.contentWindow?.print();
-      setExportingAction(false);
+      onExportDone(false);
     }
-  }, [exporting, setExportingAction]);
+  }, [exporting, onExportDone]);
 
   useEffect(() => {
     function handleMessage(e: MessageEvent) {
@@ -141,6 +141,7 @@ export default function PreviewPane({
 
       <div
         ref={outerRef}
+        onClick={handleClosePanel}
         className={`flex-1 overflow-auto ${canvas.bg}`}
         style={
           {
