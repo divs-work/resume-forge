@@ -23,7 +23,7 @@ interface ToolbarProps {
   exporting: boolean;
   onExport: () => void;
   onCloseStylePanelAction: () => void;
-  onCloseAll: () => void;
+  onCloseAllAction: () => void;
 }
 
 export default function Toolbar({
@@ -36,7 +36,7 @@ export default function Toolbar({
   exporting,
   onExport,
   onCloseStylePanelAction,
-  onCloseAll,
+  onCloseAllAction,
 }: ToolbarProps) {
   const mode = useResumeStore((s) => s.mode);
   const setMode = useResumeStore((s) => s.setMode);
@@ -49,10 +49,10 @@ export default function Toolbar({
 
   const atsScore = useMemo(() => checkAts(content).score, [content]);
 
-  const handleMarginChange  = (e: ChangeEvent<HTMLInputElement>)  => { onCloseAll(); setTemplateLayout({ marginMm: Number(e.target.value) }); };
-  const handlePaddingChange = (e: ChangeEvent<HTMLInputElement>)  => { onCloseAll(); setTemplateLayout({ paddingMm: Number(e.target.value) }); };
-  const handleSpacingChange = (e: ChangeEvent<HTMLInputElement>)  => { onCloseAll(); setTemplateLayout({ lineHeight: Number(e.target.value) }); };
-  const handleFontChange    = (e: ChangeEvent<HTMLSelectElement>) => { onCloseAll(); setFontId(e.target.value); };
+  const handleMarginChange  = (e: ChangeEvent<HTMLInputElement>)  => { onCloseAllAction(); setTemplateLayout({ marginMm: Number(e.target.value) }); };
+  const handlePaddingChange = (e: ChangeEvent<HTMLInputElement>)  => { onCloseAllAction(); setTemplateLayout({ paddingMm: Number(e.target.value) }); };
+  const handleSpacingChange = (e: ChangeEvent<HTMLInputElement>)  => { onCloseAllAction(); setTemplateLayout({ lineHeight: Number(e.target.value) }); };
+  const handleFontChange    = (e: ChangeEvent<HTMLSelectElement>) => { onCloseAllAction(); setFontId(e.target.value); };
 
   const templatesBtnCls = showTemplates
     ? `${toolbar.atsActiveBg} ${toolbar.atsActiveText}`
@@ -345,7 +345,7 @@ export default function Toolbar({
             return (
               <button
                 key={m}
-                onClick={() => { onCloseAll(); setMode(m); }}
+                onClick={() => { onCloseAllAction(); setMode(m); }}
                 className={`px-3 py-1.25 rounded-md text-[11px] font-medium transition-all ${btnCls}`}
               >
                 {MODE_CONFIG[m].label}

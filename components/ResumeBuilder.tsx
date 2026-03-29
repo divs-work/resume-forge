@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { shell } from "@/constants/theme";
 import type { SelectedEl } from "@/types/resume";
 import Toolbar from "./Toolbar";
@@ -18,12 +18,12 @@ export default function ResumeBuilder() {
   const [focusLine, setFocusLine]       = useState<number | null>(null);
   const [selectedEl, setSelectedEl]     = useState<SelectedEl | null>(null);
 
-  const closeAll = () => {
+  const closeAll = useCallback(() => {
     setShowATS(false);
     setShowTemplates(false);
     setShowHelp(false);
     setSelectedEl(null);
-  };
+  }, []);
 
   const handleExport = () => {
     setExporting(true);
@@ -53,12 +53,12 @@ export default function ResumeBuilder() {
     setShowHelp(true);
   };
 
-  const handleOpenStylePanel = (el: SelectedEl) => {
+  const handleOpenStylePanel = useCallback((el: SelectedEl) => {
     setShowATS(false);
     setShowTemplates(false);
     setShowHelp(false);
     setSelectedEl(el);
-  };
+  }, []);
 
   return (
     <div
@@ -74,7 +74,7 @@ export default function ResumeBuilder() {
         exporting={exporting}
         onExport={handleExport}
         onCloseStylePanelAction={() => setSelectedEl(null)}
-        onCloseAll={closeAll}
+        onCloseAllAction={closeAll}
       />
 
       {showAts && <ATSPanel />}
@@ -83,7 +83,7 @@ export default function ResumeBuilder() {
 
       <div className="flex flex-1 overflow-hidden min-h-0">
         <EditorPane focusLine={focusLine} onFocusLineHandledAction={() => setFocusLine(null)} onCloseStylePanelAction={closeAll} />
-        <PreviewPane exporting={exporting} onExportDone={setExporting} setFocusLine={setFocusLine} selectedEl={selectedEl} setSelectedEl={handleOpenStylePanel} onCloseAll={closeAll} />
+        <PreviewPane exporting={exporting} onExportDoneAction={setExporting} setFocusLineAction={setFocusLine} selectedEl={selectedEl} setSelectedElAction={handleOpenStylePanel} onCloseAllAction={closeAll} />
       </div>
     </div>
   );

@@ -18,18 +18,18 @@ import type { SelectedEl } from "@/types/resume";
 
 export default function PreviewPane({
   exporting,
-  onExportDone,
-  setFocusLine,
+  onExportDoneAction,
+  setFocusLineAction,
   selectedEl,
-  setSelectedEl,
-  onCloseAll,
+  setSelectedElAction,
+  onCloseAllAction,
 }: {
   exporting: boolean;
-  onExportDone: (n: boolean) => void;
-  setFocusLine: (line: number | null) => void;
+  onExportDoneAction: (n: boolean) => void;
+  setFocusLineAction: (line: number | null) => void;
   selectedEl: SelectedEl | null;
-  setSelectedEl: (el: SelectedEl) => void;
-  onCloseAll: () => void;
+  setSelectedElAction: (el: SelectedEl) => void;
+  onCloseAllAction: () => void;
 }) {
   const [scale,     setScale]     = useState(PREVIEW_INITIAL_SCALE);
   const [pageCount, setPageCount] = useState(1);
@@ -82,15 +82,15 @@ export default function PreviewPane({
   useEffect(() => {
     if (exporting) {
       iframeRef.current?.contentWindow?.print();
-      onExportDone(false);
+      onExportDoneAction(false);
     }
-  }, [exporting, onExportDone]);
+  }, [exporting, onExportDoneAction]);
 
   useEffect(() => {
     function handleMessage(e: MessageEvent) {
       if (!e.data) return;
       if (e.data.type === "rf-click") {
-        setSelectedEl({
+        setSelectedElAction({
           elIdx: e.data.elIdx,
           text: e.data.text,
           computedColor: e.data.computed.color,
@@ -98,16 +98,16 @@ export default function PreviewPane({
         });
       }
       if (e.data.type === "rf-close") {
-        onCloseAll();
+        onCloseAllAction();
       }
     }
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  }, [onCloseAllAction, setSelectedElAction]);
 
   function handleClosePanel() {
     iframeRef.current?.contentWindow?.postMessage({ type: "rf-deselect" }, "*");
-    onCloseAll();
+    onCloseAllAction();
   }
 
   const totalPaperH = pageCount * A4_HEIGHT_PX;
@@ -209,7 +209,7 @@ export default function PreviewPane({
           selected={selectedEl}
           iframeRef={iframeRef}
           onClose={handleClosePanel}
-          setFocusLine={setFocusLine}
+          setFocusLineAction={setFocusLineAction}
         />
       )}
     </div>
