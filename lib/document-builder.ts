@@ -1,6 +1,7 @@
 import type { EditorMode, ResumeTheme } from "@/types/resume";
 import { FONTS, FONT_IMPORTS } from "@/constant/fonts";
 import { parseMarkdown, parseLatex, sanitizeHTML } from "@/lib/parsers";
+import { FONT_OPTIONS } from "@/constant/style-options";
 
 // Tailwind variant prefixes that don't apply in a static iframe/print context
 const STRIP_VARIANTS =
@@ -32,10 +33,77 @@ function stripProblematicClasses(html: string): string {
   });
 }
 
+const SKIP_TAGS = new Set([
+  "script", "style", "head", "html", "body",
+  "meta", "link", "title", "base", "noscript",
+]);
+
+function injectElementIds(html: string): string {
+  let idx = 0;
+  return html.replace(
+    /<([a-zA-Z][a-zA-Z0-9]*)(\s[^>]*)?>/g,
+    (_: string, tag: string, attrs: string = "") => {
+      if (SKIP_TAGS.has(tag.toLowerCase())) return `<${tag}${attrs}>`;
+      idx++;
+      return `<${tag}${attrs} data-rf-el="${idx}">`;
+    }
+  );
+}
+
+// Only text-bearing elements are clickable/editable
+const CLICK_HANDLER =
+  `(function(){` +
+  `var T={p:1,h1:1,h2:1,h3:1,h4:1,h5:1,h6:1,li:1,td:1,th:1,span:1,a:1,strong:1,em:1,b:1,i:1};` +
+  `var sel=null;` +
+  `document.addEventListener('click',function(e){` +
+    `var el=e.target;` +
+    `while(el&&el.tagName!=='BODY'){` +
+      `if(el.hasAttribute&&el.hasAttribute('data-rf-el')&&T[el.tagName.toLowerCase()])break;` +
+      `el=el.parentElement;` +
+    `}` +
+    `if(!el||el.tagName==='BODY'){window.parent.postMessage({type:'rf-close'},'*');return;}` +
+    `if(sel){sel.style.outline='';sel.style.outlineOffset='';}` +
+    `sel=el;` +
+    `el.style.outline='2px solid #3b82f6';` +
+    `el.style.outlineOffset='2px';` +
+    `var cs=window.getComputedStyle(el);` +
+    `window.parent.postMessage({` +
+      `type:'rf-click',` +
+      `elIdx:el.getAttribute('data-rf-el'),` +
+      `tag:el.tagName.toLowerCase(),` +
+      `text:(el.textContent||'').trim().slice(0,500),` +
+      `x:e.clientX,` +
+      `y:e.clientY,` +
+      `computed:{color:cs.color,fontSize:cs.fontSize}` +
+    `},'*');` +
+    `e.preventDefault();` +
+  `});` +
+  `window.addEventListener('message',function(e){` +
+    `if(!e.data)return;` +
+    `if(e.data.type==='rf-style'){` +
+      `var el=document.querySelector('[data-rf-el="'+e.data.elIdx+'"]');` +
+      `if(!el)return;` +
+      `var s=e.data.styles;` +
+      `if(s.fontSize!==undefined)el.style.fontSize=s.fontSize;` +
+      `if(s.color!==undefined)el.style.color=s.color;` +
+    `}` +
+    `if(e.data.type==='rf-text'){` +
+      `var el=document.querySelector('[data-rf-el="'+e.data.elIdx+'"]');` +
+      `if(el)el.textContent=e.data.text;` +
+    `}` +
+    `if(e.data.type==='rf-deselect'){` +
+      `if(sel){sel.style.outline='';sel.style.outlineOffset='';sel=null;}` +
+    `}` +
+  `});` +
+  `})()`;
+
+const CLICK_SCRIPT = `<script>${CLICK_HANDLER}</` + `script>`;
+
 export function buildResumeDocument(
   rawContent: string,
   mode: EditorMode,
-  theme?: ResumeTheme
+  theme?: ResumeTheme,
+  fontId?: string
 ): string {
   let body: string;
   if (mode === "latex") {
@@ -46,8 +114,11 @@ export function buildResumeDocument(
     body = stripProblematicClasses(sanitizeHTML(rawContent));
   }
 
-  const fontUrl = FONT_IMPORTS[mode];
-  const fontFamily = FONTS[mode];
+  body = injectElementIds(body);
+
+  const overrideFont = fontId ? FONT_OPTIONS.find((f) => f.id === fontId) : null;
+  const fontUrl = overrideFont?.importUrl ?? FONT_IMPORTS[mode];
+  const fontFamily = overrideFont?.family ?? FONTS[mode];
 
   const tailwindScript = `<script src="https://cdn.tailwindcss.com"><\/script>`;
 
@@ -58,6 +129,7 @@ export function buildResumeDocument(
 <base target="_blank"/>
 <link href="${fontUrl}" rel="stylesheet"/>
 ${tailwindScript}
+${CLICK_SCRIPT}
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 

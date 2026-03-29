@@ -6,6 +6,7 @@ import { checkATS } from "@/lib/ats";
 import { MODE_CONFIG } from "@/constant/config";
 import type { EditorMode } from "@/types/resume";
 import { shell, modeBg, toolbar } from "@/constant/theme";
+import { FONT_OPTIONS } from "@/constant/style-options";
 
 interface ToolbarProps {
   showATS: boolean;
@@ -28,6 +29,8 @@ export default function Toolbar({
   const setMode = useResumeStore((s) => s.setMode);
   const content = useResumeStore((s) => s.content[s.mode]);
   const resetTemplate = useResumeStore((s) => s.resetTemplate);
+  const fontId = useResumeStore((s) => s.fontId);
+  const setFontId = useResumeStore((s) => s.setFontId);
 
   const atsScore = useMemo(() => checkATS(content).score, [content]);
 
@@ -306,7 +309,7 @@ export default function Toolbar({
         </div>
         <div className={`w-px h-4.4 ${shell.divider}`} />
         <div className={`flex ${shell.bgMuted} rounded-lg p-0.5 gap-0.5`}>
-          {(["latex", "markdown", "html"] as EditorMode[]).map((m) => (
+          {(["markdown", "latex", "html"] as EditorMode[]).map((m) => (
             <button
               key={m}
               onClick={() => setMode(m)}
@@ -324,6 +327,18 @@ export default function Toolbar({
 
       {/* RIGHT */}
       <div className="flex items-center gap-1.25 flex-wrap">
+        {/* Global font */}
+        <select
+          value={fontId}
+          onChange={(e) => setFontId(e.target.value)}
+          className={`px-2 py-1.25 rounded-lg text-[11px] font-medium border-none cursor-pointer ${shell.bgMuted} ${shell.textMuted} outline-none`}
+        >
+          <option value="">Default Font</option>
+          {FONT_OPTIONS.map((f) => (
+            <option key={f.id} value={f.id}>{f.name}</option>
+          ))}
+        </select>
+        <div className={`w-px h-4 ${shell.divider}`} />
         {/* Templates */}
         <button
           onClick={onToggleTemplates}

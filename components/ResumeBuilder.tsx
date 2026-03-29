@@ -13,6 +13,8 @@ export default function ResumeBuilder() {
   const [showTemplates, setShowTemplates] = useState(false);
   const [exporting, setExporting] = useState(false);
 
+  const closeAll = () => { setShowATS(false); setShowTemplates(false); };
+
   const handleExport = () => {
     setExporting(true);
   };
@@ -23,9 +25,9 @@ export default function ResumeBuilder() {
     >
       <Toolbar
         showATS={showATS}
-        onToggleATS={() => { setShowATS((v) => !v); setShowTemplates(false); }}
+        onToggleATS={() => { closeAll(); setShowATS((v) => !v); }}
         showTemplates={showTemplates}
-        onToggleTemplates={() => { setShowTemplates((v) => !v); setShowATS(false); }}
+        onToggleTemplates={() => { closeAll(); setShowTemplates((v) => !v); }}
         exporting={exporting}
         onExport={handleExport}
       />
