@@ -4,7 +4,7 @@ import type { EditorMode, ResumeTheme, TemplateLayout } from "@/types/resume";
 import { TEMPLATES } from "@/constants/templates";
 import { DEFAULT_LATEX_THEME } from "@/constants/templatesLatex";
 import { DEFAULT_MD_THEME } from "@/constants/templatesMarkdown";
-import { DEFAULT_TEMPLATE_LAYOUT } from "@/constants/config";
+import { DEFAULT_TEMPLATE_LAYOUT, STORE_KEY } from "@/constants/config";
 
 interface ResumeState {
   mode: EditorMode;
@@ -63,7 +63,7 @@ export const useResumeStore = create<ResumeStore>()(
       },
     }),
     {
-      name: "resume-forge-v2",
+      name: STORE_KEY,
       partialize: (state) => ({
         mode: state.mode,
         content: state.content,

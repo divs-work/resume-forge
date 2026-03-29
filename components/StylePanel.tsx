@@ -4,6 +4,13 @@ import { useRef, useState } from "react";
 import { useResumeStore } from "@/store/resumeStore";
 import { replaceTextInSource, applyStyleToSource } from "@/helper/sourcePatcher";
 import { shell } from "@/constants/theme";
+import {
+  TEXT_DEBOUNCE_MS,
+  STYLE_DEBOUNCE_MS,
+  STYLE_PANEL_FONT_SIZE_MIN,
+  STYLE_PANEL_FONT_SIZE_MAX,
+  STYLE_PANEL_TEXT_FRAGMENT,
+} from "@/constants/config";
 import type { SelectedEl } from "@/types/resume";
 
 interface Props {
@@ -44,7 +51,7 @@ export default function StylePanel({ selected, iframeRef, onClose, setFocusLine 
       const patched = replaceTextInSource(store.content[store.mode], prevTextRef.current, pendingTextRef.current, store.mode);
       store.setContent(patched);
       prevTextRef.current = pendingTextRef.current;
-    }, 400);
+    }, TEXT_DEBOUNCE_MS);
   }
 
   function handleFontSizeChange(val: string) {
@@ -57,7 +64,7 @@ export default function StylePanel({ selected, iframeRef, onClose, setFocusLine 
       const store = useResumeStore.getState();
       const patched = applyStyleToSource(store.content[store.mode], store.mode, prevTextRef.current, { fontSize: `${val}px` });
       store.setContent(patched);
-    }, 300);
+    }, STYLE_DEBOUNCE_MS);
   }
 
   function handleColorChange(val: string) {
@@ -69,7 +76,7 @@ export default function StylePanel({ selected, iframeRef, onClose, setFocusLine 
       const store = useResumeStore.getState();
       const patched = applyStyleToSource(store.content[store.mode], store.mode, prevTextRef.current, { color: val });
       store.setContent(patched);
-    }, 300);
+    }, STYLE_DEBOUNCE_MS);
   }
 
   function handleGoToCode() {
@@ -78,7 +85,7 @@ export default function StylePanel({ selected, iframeRef, onClose, setFocusLine 
     const searchText = prevTextRef.current;
     let lineNum = lines.findIndex((l) => l.includes(searchText));
     if (lineNum < 0) {
-      const fragment = searchText.slice(0, 30).trim();
+      const fragment = searchText.slice(0, STYLE_PANEL_TEXT_FRAGMENT).trim();
       if (fragment) lineNum = lines.findIndex((l) => l.includes(fragment));
     }
     if (lineNum >= 0) setFocusLine(lineNum + 1);
@@ -102,7 +109,7 @@ export default function StylePanel({ selected, iframeRef, onClose, setFocusLine 
 
         <div>
           <label className={`block text-[10px] ${shell.textFaint} mb-1`}>Size (px)</label>
-          <input type="number" value={fontSize} min={6} max={72} onChange={(e) => handleFontSizeChange(e.target.value)} className={inputClass} />
+          <input type="number" value={fontSize} min={STYLE_PANEL_FONT_SIZE_MIN} max={STYLE_PANEL_FONT_SIZE_MAX} onChange={(e) => handleFontSizeChange(e.target.value)} className={inputClass} />
         </div>
 
         <div>

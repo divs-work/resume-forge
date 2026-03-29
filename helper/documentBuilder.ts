@@ -2,7 +2,16 @@ import type { EditorMode, ResumeTheme, TemplateLayout } from "@/types/resume";
 import { FONTS, FONT_IMPORTS } from "@/constants/fonts";
 import { parseMarkdown, parseLatex, sanitizeHTML } from "@/helper/parsers";
 import { FONT_OPTIONS } from "@/constants/styleOptions";
-import { A4_WIDTH_MM, DEFAULT_TEMPLATE_LAYOUT } from "@/constants/config";
+import {
+  A4_WIDTH_MM,
+  DEFAULT_TEMPLATE_LAYOUT,
+  SELECTION_OUTLINE,
+  SELECTION_OUTLINE_OFFSET,
+  TEXT_CONTENT_SLICE,
+  BODY_FONT_SIZE,
+  LINK_COLOR,
+  TAILWIND_CDN,
+} from "@/constants/config";
 
 // Tailwind variant prefixes that don't apply in a static iframe/print context
 const STRIP_VARIANTS =
@@ -65,14 +74,14 @@ const CLICK_HANDLER =
     `if(!el||el.tagName==='BODY'){if(sel){sel.style.outline='';sel.style.outlineOffset='';sel=null;}window.parent.postMessage({type:'rf-close'},'*');return;}` +
     `if(sel){sel.style.outline='';sel.style.outlineOffset='';}` +
     `sel=el;` +
-    `el.style.outline='2px solid #3b82f6';` +
-    `el.style.outlineOffset='2px';` +
+    `el.style.outline='${SELECTION_OUTLINE}';` +
+    `el.style.outlineOffset='${SELECTION_OUTLINE_OFFSET}';` +
     `var cs=window.getComputedStyle(el);` +
     `window.parent.postMessage({` +
       `type:'rf-click',` +
       `elIdx:el.getAttribute('data-rf-el'),` +
       `tag:el.tagName.toLowerCase(),` +
-      `text:(el.textContent||'').trim().slice(0,500),` +
+      `text:(el.textContent||'').trim().slice(0,${TEXT_CONTENT_SLICE}),` +
       `x:e.clientX,` +
       `y:e.clientY,` +
       `computed:{color:cs.color,fontSize:cs.fontSize}` +
@@ -127,7 +136,7 @@ export function buildResumeDocument(
     ? `* { font-family: ${fontFamily} !important; }`
     : "";
 
-  const tailwindScript = `<script src="https://cdn.tailwindcss.com"><\/script>`;
+  const tailwindScript = `<script src="${TAILWIND_CDN}"><\/script>`;
 
   return `<!DOCTYPE html>
 <html>
@@ -148,7 +157,7 @@ ${CLICK_SCRIPT}
 
   body {
     font-family: ${fontFamily};
-    font-size: 11pt;
+    font-size: ${BODY_FONT_SIZE};
     line-height: ${layout?.lineHeight ?? DEFAULT_TEMPLATE_LAYOUT.lineHeight};
     color: #000;
     background: #fff;
@@ -161,7 +170,7 @@ ${CLICK_SCRIPT}
   }
 
   ${fontOverrideCSS}
-  a { color: #1a5fb4; text-decoration: none; }
+  a { color: ${LINK_COLOR}; text-decoration: none; }
   img { max-width: 100%; height: auto; }
 
   .page-break { page-break-before: always; break-before: page; }

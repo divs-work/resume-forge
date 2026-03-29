@@ -16,11 +16,10 @@ export default function ResumeBuilder() {
   const [focusLine, setFocusLine]   = useState<number | null>(null);
   const [selectedEl, setSelectedEl] = useState<SelectedEl | null>(null);
 
-  const handleCloseStylePanel = () => setSelectedEl(null);
-
-  const handleCloseAll = () => {
+  const closeAll = () => {
     setShowATS(false);
     setShowTemplates(false);
+    setSelectedEl(null);
   };
 
   const handleExport = () => {
@@ -28,13 +27,23 @@ export default function ResumeBuilder() {
   };
 
   const handleToggleATS = () => {
-    if (showAts) { handleCloseAll(); return; }
-    setShowATS((v) => !v);
+    if (showAts) { closeAll(); return; }
+    setSelectedEl(null);
+    setShowTemplates(false);
+    setShowATS(true);
   };
 
   const handleToggleTemplates = () => {
-    if (showTemplates) { handleCloseAll(); return; }
-    setShowTemplates((v) => !v);
+    if (showTemplates) { closeAll(); return; }
+    setSelectedEl(null);
+    setShowATS(false);
+    setShowTemplates(true);
+  };
+
+  const handleOpenStylePanel = (el: SelectedEl) => {
+    setShowATS(false);
+    setShowTemplates(false);
+    setSelectedEl(el);
   };
 
   return (
@@ -48,15 +57,15 @@ export default function ResumeBuilder() {
         onToggleTemplates={handleToggleTemplates}
         exporting={exporting}
         onExport={handleExport}
-        onCloseStylePanel={handleCloseStylePanel}
+        onCloseStylePanel={() => setSelectedEl(null)}
       />
 
       {showAts && <ATSPanel />}
       {showTemplates && <TemplatesPanel />}
 
       <div className="flex flex-1 overflow-hidden min-h-0">
-        <EditorPane focusLine={focusLine} onFocusLineHandled={() => setFocusLine(null)} onCloseStylePanel={handleCloseStylePanel} />
-        <PreviewPane exporting={exporting} onExportDone={setExporting} setFocusLine={setFocusLine} selectedEl={selectedEl} setSelectedEl={setSelectedEl} />
+        <EditorPane focusLine={focusLine} onFocusLineHandled={() => setFocusLine(null)} onCloseStylePanel={closeAll} />
+        <PreviewPane exporting={exporting} onExportDone={setExporting} setFocusLine={setFocusLine} selectedEl={selectedEl} setSelectedEl={handleOpenStylePanel} onCloseAll={closeAll} />
       </div>
     </div>
   );
