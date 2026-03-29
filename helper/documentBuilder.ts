@@ -136,6 +136,12 @@ export function buildResumeDocument(
     ? `* { font-family: ${fontFamily} !important; }`
     : "";
 
+  // Tailwind's leading-* classes override body line-height (Tailwind CDN injects after our <style>).
+  // For Markdown/LaTeX force the user's spacing value on all elements, same pattern as fontOverrideCSS.
+  const lineHeightOverrideCSS = mode !== "html"
+    ? `* { line-height: ${layout?.lineHeight ?? DEFAULT_TEMPLATE_LAYOUT.lineHeight} !important; }`
+    : "";
+
   const tailwindScript = `<script src="${TAILWIND_CDN}"><\/script>`;
 
   return `<!DOCTYPE html>
@@ -170,6 +176,7 @@ ${CLICK_SCRIPT}
   }
 
   ${fontOverrideCSS}
+  ${lineHeightOverrideCSS}
   a { color: ${LINK_COLOR}; text-decoration: none; }
   img { max-width: 100%; height: auto; }
 
