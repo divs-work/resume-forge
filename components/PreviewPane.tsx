@@ -4,7 +4,9 @@ import { useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { useResumeStore } from "@/store/resume-store";
 import { MODE_CONFIG } from "@/constant/config";
 import { buildResumeDocument } from "@/lib/document-builder";
+import { applyStyleToSource, replaceTextInSource } from "@/lib/source-patcher";
 import { shell, canvas } from "@/constant/theme";
+import FloatingStyleBar, { type ClickInfo } from "./FloatingStyleBar";
 
 const A4_WIDTH = 794;
 const A4_HEIGHT = 1123;
@@ -16,30 +18,28 @@ export default function PreviewPane({
   exporting: boolean;
   setExportingAction: (n: boolean) => void;
 }) {
-  const mode = useResumeStore((s) => s.mode);
-  const content = useResumeStore((s) => s.content[s.mode]);
-  const parsed = useResumeStore((s) => s.parsed[s.mode]);
-  const parsedChanged = useResumeStore((s) => s.parsedChanged);
-  const contentChanged = useResumeStore((s) => s.contentChanged);
-  const markdownTheme = useResumeStore((s) => s.markdownTheme);
-  const latexTheme = useResumeStore((s) => s.latexTheme);
+  const mode           = useResumeStore((s) => s.mode);
+  const content        = useResumeStore((s) => s.content[s.mode]);
+  const markdownTheme  = useResumeStore((s) => s.markdownTheme);
+  const latexTheme     = useResumeStore((s) => s.latexTheme);
+  const fontId         = useResumeStore((s) => s.fontId);
+  const setContent     = useResumeStore((s) => s.setContent);
+  const setFocusLine   = useResumeStore((s) => s.setFocusLine);
+  const resetKey       = useResumeStore((s) => s.resetKey);
 
   const cfg = MODE_CONFIG[mode];
-  const outerRef = useRef<HTMLDivElement>(null);
+  const outerRef  = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const [scale, setScale] = useState(0.7);
+  const [scale,     setScale]     = useState(0.7);
   const [pageCount, setPageCount] = useState(1);
+  const [clickInfo, setClickInfo] = useState<ClickInfo | null>(null);
 
   const docHTML = useMemo(() => {
-    if (mode === "html") {
-      return buildResumeDocument(content, mode);
-    } else if (mode === "markdown") {
-      return buildResumeDocument(content, mode, markdownTheme);
-    } else if (mode === "latex") {
-      return buildResumeDocument(content, mode, latexTheme);
-    }
-  }, [content, mode, markdownTheme, latexTheme]);
+    if (mode === "markdown") return buildResumeDocument(content, mode, markdownTheme, fontId);
+    if (mode === "latex")    return buildResumeDocument(content, mode, latexTheme, fontId);
+    return buildResumeDocument(content, mode, undefined, fontId);
+  }, [content, mode, markdownTheme, latexTheme, fontId]);
 
   const updateScale = useCallback(() => {
     if (!outerRef.current) return;
@@ -58,8 +58,7 @@ export default function PreviewPane({
         const body = iframeRef.current?.contentDocument?.body;
         if (body) {
           const h = body.scrollHeight;
-          if (h > 100)
-            setPageCount(Math.ceil(Math.max(A4_HEIGHT, h) / A4_HEIGHT));
+          if (h > 100) setPageCount(Math.ceil(Math.max(A4_HEIGHT, h) / A4_HEIGHT));
         }
       } catch {}
     }, 300);
@@ -73,6 +72,91 @@ export default function PreviewPane({
     }
   }, [exporting, setExportingAction]);
 
+  useEffect(() => {
+    const el = outerRef.current;
+    if (!el) return;
+    const close = () => {
+      setClickInfo(null);
+      iframeRef.current?.contentWindow?.postMessage({ type: "rf-deselect" }, "*");
+    };
+    el.addEventListener("scroll", close);
+    return () => el.removeEventListener("scroll", close);
+  }, []);
+
+  useEffect(() => {
+    const handler = (e: MessageEvent) => {
+      if (!e.data) return;
+
+      if (e.data.type === "rf-close") {
+        setClickInfo(null);
+        iframeRef.current?.contentWindow?.postMessage({ type: "rf-deselect" }, "*");
+        return;
+      }
+
+      if (e.data.type !== "rf-click") return;
+      const iframeRect = iframeRef.current?.getBoundingClientRect();
+      const canvasRect = outerRef.current?.getBoundingClientRect();
+      if (!iframeRect || !canvasRect) return;
+      const rawX  = iframeRect.left + e.data.x * scale;
+      const pageX = Math.max(canvasRect.left, rawX);
+      const pageY = iframeRect.top  + e.data.y * scale;
+      setClickInfo({
+        elIdx:    e.data.elIdx,
+        tag:      e.data.tag,
+        text:     e.data.text,
+        pageX,
+        pageY,
+        computed: e.data.computed,
+      });
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, [scale]);
+
+  const handleStyleChange = useCallback(
+    (elIdx: string, styles: Record<string, string>) => {
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: "rf-style", elIdx, styles },
+        "*"
+      );
+    },
+    []
+  );
+
+  const handleStyleCommit = useCallback(
+    (_elIdx: string, styles: Record<string, string>) => {
+      if (!clickInfo) return;
+      setContent(applyStyleToSource(content, mode, clickInfo.text, styles));
+      setClickInfo(null);
+    },
+    [content, mode, clickInfo, setContent]
+  );
+
+  const handleTextChange = useCallback(
+    (elIdx: string, oldText: string, newText: string) => {
+      setContent(replaceTextInSource(content, oldText, newText));
+      setClickInfo(null);
+    },
+    [content, setContent]
+  );
+
+  const handleGoToCode = useCallback(
+    (text: string) => {
+      if (!text.trim()) return;
+      const search = text.trim().slice(0, 60);
+      const lines = content.split("\n");
+      const idx = lines.findIndex((l) => l.includes(search));
+      setFocusLine(idx >= 0 ? idx + 1 : 1);
+      setClickInfo(null);
+    },
+    [content, setFocusLine]
+  );
+
+  const handleClose = useCallback(() => {
+    iframeRef.current?.contentWindow?.postMessage({ type: "rf-deselect" }, "*");
+    setClickInfo(null);
+  }, []);
+
   const totalPaperH = pageCount * A4_HEIGHT;
 
   const breakLines = useMemo(() => {
@@ -80,11 +164,6 @@ export default function PreviewPane({
     for (let i = 1; i < pageCount; i++) lines.push(i * A4_HEIGHT);
     return lines;
   }, [pageCount]);
-
-  const renderHTML = useMemo(() => {
-    if (parsedChanged > contentChanged) return parsed;
-    return docHTML;
-  }, [docHTML, parsed, parsedChanged, contentChanged]);
 
   return (
     <div className="flex flex-col min-w-0 flex-1">
@@ -135,8 +214,9 @@ export default function PreviewPane({
             />
 
             <iframe
+              key={resetKey}
               ref={iframeRef}
-              srcDoc={renderHTML}
+              srcDoc={docHTML}
               className="w-198.5 h-(--total-h) border-0 bg-transparent overflow-hidden transform-[scale(var(--scale))] origin-top-left absolute top-0 left-0"
               sandbox="allow-scripts allow-same-origin allow-modals allow-popups"
               title="Resume Preview"
@@ -169,6 +249,17 @@ export default function PreviewPane({
           </div>
         </div>
       </div>
+
+      {clickInfo && (
+        <FloatingStyleBar
+          info={clickInfo}
+          onStyleChange={handleStyleChange}
+          onStyleCommit={handleStyleCommit}
+          onTextChange={handleTextChange}
+          onGoToCode={handleGoToCode}
+          onClose={handleClose}
+        />
+      )}
     </div>
   );
 }

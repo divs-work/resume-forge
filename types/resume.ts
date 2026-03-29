@@ -37,4 +37,3 @@ export interface ResumeTheme {
 }
 
 export type EditorMode = "latex" | "markdown" | "html";
-export type View = "editor" | "parsed";

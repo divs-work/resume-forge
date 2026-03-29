@@ -10,7 +10,6 @@ export const shell = {
   bg:            "bg-white",
   bgSubtle:      "bg-gray-50",    // panels, headers, app container
   bgMuted:       "bg-gray-100",   // button groups, secondary surfaces
-  bgInverted:    "bg-gray-900",   // active/toggled dark buttons
   divider:       "bg-gray-200",   // thin vertical dividers
   border:        "border-gray-200",
   text:          "text-gray-900",
@@ -18,23 +17,17 @@ export const shell = {
   textMuted:     "text-gray-500",
   textFaint:     "text-gray-400",
   textInverse:   "text-white",
-  shadow:        "shadow-sm",
   iconStroke:    "stroke-gray-400",
-  iconFill:      "fill-white",
-  hoverBg:       "hover:bg-gray-200",
   hoverText:     "hover:text-gray-700",
 } as const;
 
 // ─── Editor (dark GitHub-style) ───────────────────────────────────────────────
 export const editor = {
-  barBg:        "bg-[#161b22]",
-  border:       "border-[#30363d]",
-  activeBg:     "bg-[#0d1117]",
-  inactiveBg:   "bg-[#1c2128]",
-  activeText:   "text-[#e6edf3]",
-  inactiveText: "text-[#636c76]",
-  mutedText:    "text-[#8b949e]",
-  text:         "text-[#c9d1d9]",
+  barBg:    "bg-[#161b22]",
+  border:   "border-[#30363d]",
+  activeBg: "bg-[#0d1117]",
+  mutedText:"text-[#8b949e]",
+  text:     "text-[#c9d1d9]",
 } as const;
 
 // ─── Per-mode accents ─────────────────────────────────────────────────────────
@@ -44,11 +37,6 @@ export const modeBg: Record<string, string> = {
   html:     "bg-orange-600",
 };
 
-export const modeCaret: Record<string, string> = {
-  latex:    "caret-red-600",
-  markdown: "caret-blue-600",
-  html:     "caret-orange-600",
-};
 
 
 // ─── Preview canvas ───────────────────────────────────────────────────────────
