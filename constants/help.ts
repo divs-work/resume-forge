@@ -453,9 +453,601 @@ Allowed HTML tags: h1–h6, p, br, hr, ul, ol, li, strong, em, b, i, a, span, di
 //  EXPORT — single object for easy import
 // ─────────────────────────────────────────────────────────────────────────────
 
+// ─────────────────────────────────────────────────────────────────────────────
+//  AI PROMPTS
+//  Copy-paste prompts for generating resume templates with an AI assistant.
+//  Brackets like [Your Name] mark places users should customise before pasting.
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface AiPrompt {
+  id: string;
+  mode: string;
+  title: string;
+  description: string;
+  prompt: string;
+}
+
+export const AI_PROMPTS: AiPrompt[] = [
+  /* ── MARKDOWN — FULL RESUME ────────────────────────────────────────── */
+  {
+    id: "markdown-full",
+    mode: "Markdown",
+    title: "Full resume — Markdown",
+    description: "Generates a complete resume in Markdown that is fully compatible with ResumeForge's parser (marked v14 / GFM). Includes every constraint the renderer enforces.",
+    prompt: `You are generating a resume in Markdown for an app called ResumeForge.
+Copy this prompt, edit every [bracketed placeholder] with your own details, then paste it into any AI (ChatGPT, Claude, Gemini, etc.). Paste the AI output directly into ResumeForge's editor.
+
+═══════════════════════════════════════════════════════════════
+RESUMEFORGE MARKDOWN — PARSER & RENDERER CONSTRAINTS
+The app parses Markdown with "marked" (GitHub Flavored Markdown).
+The HTML output is then sanitised with DOMPurify.
+Only these HTML tags survive sanitisation:
+  h1 h2 h3 h4 h5 h6 p br hr ul ol li strong em b i a span div
+  section header code pre table thead tbody tr td th
+Only these attributes survive: href, src, alt, style, class, id, target, data-*
+Tags like <script>, <iframe>, <img>, <form>, <button>, <input>,
+<style>, <object>, <embed>, <svg>, <canvas> are STRIPPED.
+═══════════════════════════════════════════════════════════════
+
+OUTPUT FORMAT — follow these rules exactly:
+1. Output ONLY raw Markdown. No code fences, no explanation, no preamble, no closing remarks.
+2. The very first line must be: # [name] — this becomes the h1 heading.
+3. Use ## for section headings (Summary, Experience, Education, Skills, Projects, Certifications — include only the sections the user supplies below).
+4. Use ### for sub-entries (company names or project names within a section).
+5. Use #### sparingly for sub-sub-entries (e.g. a sub-project under a company).
+
+FORMATTING RULES:
+- **bold** → company names, institution names, key terms, skill group labels.
+- _italic_ or *italic* → job titles, degree names, dates.
+- \`backtick\` → technical skill names inline (renders as <code> in monospace).
+- - (dash) for unordered bullet lists. Each bullet = one line, no sub-bullets unless the user asks.
+- 1. 2. 3. for ordered/numbered lists (rarely needed in resumes).
+- --- (three dashes on their own line) → horizontal divider <hr> between major sections.
+- [Label](URL) → clickable hyperlink. Use for LinkedIn, GitHub, portfolio, email (mailto:your@email.com).
+- | Col1 | Col2 |  with a |---|---| header row → GFM table. Good for skills matrices.
+- > blockquote → supported but has no special theme styling, so use sparingly.
+- Leave a blank line between every heading, paragraph, and list. Without it content merges into one paragraph.
+
+THINGS THAT DO NOT WORK (the parser or sanitiser strips them):
+- No images (<img> is stripped). Do not use ![alt](url).
+- No embedded HTML that uses stripped tags (script, iframe, form, button, input, svg, canvas, object, embed).
+- No LaTeX syntax (\\textbf etc.) — this is Markdown mode, not LaTeX mode.
+- No code fences (\`\`\`) for layout — only use \`backtick\` for inline code.
+- No raw CSS classes on Markdown elements (classes are only usable in HTML mode).
+
+INLINE STYLE OVERRIDE (optional, advanced):
+  You CAN insert <span style="color:#e11d48;font-size:13px">text</span> directly
+  in Markdown — the parser allows inline HTML, and DOMPurify keeps <span> + style.
+  Use this ONLY if the user wants a specific colour or size on a word.
+
+PAGE & PRINT CONSTRAINTS:
+- The preview renders at A4 width (794 px / 210 mm). Body font is 11 pt.
+- Aim for ONE A4 page (~400–600 words). If content is long, cut older roles or reduce bullets.
+- For a page break (multi-page resumes only) insert: <div class="page-break"></div>
+  on its own line — it forces a new printed page in the PDF export.
+- The PDF is generated via the browser's print dialog, so what the user sees in the preview is exactly what prints.
+
+═══════════════════════════════════════════════════════════════
+MY DETAILS — edit every [bracket] below, then paste this whole prompt into AI.
+Delete any section you don't need. Add more roles/projects by copying the block.
+═══════════════════════════════════════════════════════════════
+
+Full name: [Your Full Name]
+Job title / role applying for: [Target Role, e.g. Senior Frontend Engineer]
+Location: [City, Country  — or "Remote"]
+Email: [your@email.com]
+Phone: [+1 555 000 0000]
+LinkedIn: [https://linkedin.com/in/yourprofile]
+GitHub / Portfolio: [https://github.com/yourusername]
+
+--- PROFESSIONAL SUMMARY (2–3 sentences) ---
+[Describe who you are and what you bring. E.g. "Senior frontend engineer with 8 years building React applications at scale…"]
+
+--- WORK EXPERIENCE (most recent first) ---
+[Copy this block for each role:]
+Company: [Company Name]
+Title: [Job Title]
+Dates: [Start – End, e.g. Jan 2021 – Present]
+Location: [City or Remote]
+Achievements (3–5 bullets, each starting with a strong action verb):
+- [e.g. Led migration of monolith to microservices, reducing deploy time by 60%]
+- [add more]
+
+--- EDUCATION ---
+[Degree, Institution, Graduation Year, GPA if notable]
+
+--- SKILLS (comma-separated, grouped) ---
+[Languages: JavaScript, TypeScript, Python
+Frameworks: React, Next.js, Node.js
+Tools: Docker, AWS, Git
+Soft Skills: Leadership, Communication]
+
+--- PROJECTS (optional) ---
+[Project Name — one-line description — https://link]
+
+--- CERTIFICATIONS (optional) ---
+[Certification Name, Year]
+
+Now generate the complete Markdown resume.`,
+  },
+
+  /* ── LATEX — FULL RESUME ───────────────────────────────────────────── */
+  {
+    id: "latex-full",
+    mode: "LaTeX",
+    title: "Full resume — LaTeX",
+    description: "Generates a resume using ResumeForge's custom regex-based LaTeX renderer. Lists every supported and unsupported command so the AI never outputs broken syntax.",
+    prompt: `You are generating a resume in LaTeX for an app called ResumeForge.
+Copy this prompt, edit every [bracketed placeholder] with your own details, then paste it into any AI (ChatGPT, Claude, Gemini, etc.). Paste the AI output directly into ResumeForge's editor.
+
+═══════════════════════════════════════════════════════════════
+RESUMEFORGE LATEX — PARSER & RENDERER CONSTRAINTS
+This is NOT a full LaTeX engine (no pdflatex / xelatex). It is a custom
+regex-based parser built into the app (helper/parsers.ts → parseLatex).
+Unsupported commands are silently STRIPPED. Only the commands listed
+below actually render. The HTML output is then sanitised with DOMPurify.
+
+After parsing, only these HTML tags survive:
+  h1 h2 h3 h4 h5 h6 p br hr ul ol li strong em b i a span div
+  section header code pre table thead tbody tr td th
+Only these attributes survive: href, src, alt, style, class, id, target, data-*
+═══════════════════════════════════════════════════════════════
+
+OUTPUT FORMAT — follow these rules exactly:
+1. Output ONLY raw LaTeX. No explanation, no preamble, no closing remarks.
+2. Start with \\begin{document} and end with \\end{document}.
+3. Do NOT include ANY preamble: no \\documentclass, \\usepackage, \\geometry,
+   \\pagestyle, \\author, \\title, \\date, \\maketitle, or any setup commands.
+   Everything outside \\begin{document}...\\end{document} is ignored by the parser.
+4. Lines starting with % are treated as comments and stripped.
+
+═══════════════════════════════════════════════════════════════
+SUPPORTED COMMANDS — use ONLY these (anything else is stripped)
+═══════════════════════════════════════════════════════════════
+
+DOCUMENT & LAYOUT:
+  \\begin{document} ... \\end{document}     wraps all content
+  \\begin{center} ... \\end{center}          centres a block → <div class="text-center mb-4">
+  \\\\                                        line break → <br>
+  \\newpage                                   page break → <div class="page-break">
+
+CUSTOM RESUME COMMANDS (ResumeForge-specific):
+  \\rsection{Title}                          section heading → <h2> with theme styling
+  \\rjob{Company}{Job Title}{Date Range}     job entry → <h3> company + date right-aligned, <h4> title
+  \\rfstyle{CSS properties}{text}            inline style → <span style="CSS">text</span>
+    Example: \\rfstyle{color: #e11d48; font-size: 13px}{Remote}
+
+TEXT FORMATTING:
+  \\textbf{text}                              bold → <strong>
+  \\textit{text}                              italic → <em>
+  \\emph{text}                                italic → <em> (same as \\textit)
+  \\textsc{text}                              small caps → <span class="uppercase tracking-wider text-sm">
+
+FONT SIZE COMMANDS (wrap text inside { }):
+  {\\Huge text}         → text-4xl (~36 px)    great for your name
+  {\\huge text}         → text-3xl (~30 px)
+  {\\LARGE text}        → text-2xl (~24 px)
+  {\\Large text}        → text-xl  (~20 px)
+  {\\large text}        → text-lg  (~18 px)    good for taglines
+  {\\normalsize text}   → (default size)
+  {\\small text}        → text-sm  (~14 px)    good for contact lines
+  {\\footnotesize text} → text-sm  (~12 px)    good for dates
+  {\\scriptsize text}   → (very small)
+  {\\tiny text}         → (very small)
+
+FONT WEIGHT / SHAPE (can combine with size inside same { }):
+  {\\bfseries text}     → font-bold           (alternative to \\textbf)
+  {\\itshape text}      → italic              (alternative to \\textit)
+  {\\large\\bfseries Title}  → large + bold   (combination example)
+
+LINKS:
+  \\href{https://url}{Label}                  → <a href="url">Label</a>
+  \\url{https://url}                          → <a href="url">url</a>
+
+LISTS:
+  \\begin{itemize}                            unordered bullet list → <ul>
+    \\item First bullet
+    \\item Second bullet
+  \\end{itemize}
+
+  \\begin{enumerate}                          numbered list → <ol>
+    \\item First
+    \\item Second
+  \\end{enumerate}
+  NOTE: nested \\item sub-lists are NOT supported.
+
+TABLES:
+  \\begin{tabular}{ll}                        simple table → <table>
+    \\hline                                    makes first row a header → <thead>
+    Skill & Level \\\\
+    React & Expert \\\\
+  \\end{tabular}
+  NOTE: column format letters (l, r, c) are parsed but all columns render the same width.
+  Rows end with \\\\ or \\\\[skip]. Columns separated by &.
+
+HORIZONTAL RULE:
+  \\rule{\\linewidth}{0.4pt}                  → <hr>
+
+SPECIAL CHARACTERS:
+  \\&  → &        \\%  → %        \\#  → #        \\$  → $
+  \\~  → non-breaking space       \\,  → thin space (good between initials)
+  \\quad → two spaces             \\qquad → four spaces
+
+DASHES:
+  ---  → — (em dash)              --  → – (en dash, use for date ranges)
+
+MATH-MODE SEPARATORS (only these work — all other math is stripped):
+  $\\bullet$      → • bullet point separator
+  $\\cdot$        → · centre dot separator
+  $\\textbullet$  → • bullet
+  $|$             → | pipe separator
+
+═══════════════════════════════════════════════════════════════
+COMMANDS THAT ARE SILENTLY STRIPPED (do NOT use):
+═══════════════════════════════════════════════════════════════
+\\documentclass  \\usepackage  \\geometry  \\pagestyle  \\thispagestyle
+\\fancyhf  \\lhead  \\rhead  \\cfoot  \\lfoot  \\rfoot
+\\renewcommand  \\newcommand  \\setlength  \\addtolength
+\\vspace  \\vspace*  \\hspace  \\hspace*  \\noindent
+\\centering  \\raggedright  \\raggedleft
+\\hfill  \\hrulefill  \\dotfill  \\vfill
+\\linewidth  \\textwidth (as standalone)
+\\medskip  \\smallskip  \\bigskip
+\\parindent  \\parskip
+\\clearpage (use \\newpage instead)
+\\multicols  \\minipage  \\parbox  \\tabularx  \\adjustbox
+\\mdseries  \\upshape (removed silently)
+Any math environment beyond the 4 separators above ($E=mc^2$ → stripped)
+Any unknown \\command{arg} → shows just "arg" text
+Any unknown \\command (no arg) → removed entirely
+
+═══════════════════════════════════════════════════════════════
+PAGE & PRINT CONSTRAINTS:
+═══════════════════════════════════════════════════════════════
+- The preview renders at A4 width (794 px / 210 mm). Body font is 11 pt.
+- Default font: STIX Two Text (serif). The user can override via toolbar.
+- Theme styles (heading colours, borders, spacing) are applied automatically
+  via Tailwind classes — your LaTeX doesn't need to handle colours/spacing.
+- Aim for ONE A4 page. If content is long, reduce bullets or cut old roles.
+- \\newpage forces a page break for multi-page resumes.
+- The PDF is generated via the browser's print dialog.
+
+═══════════════════════════════════════════════════════════════
+MY DETAILS — edit every [bracket] below, then paste this whole prompt into AI.
+Delete any section you don't need. Add more roles/projects by copying the block.
+═══════════════════════════════════════════════════════════════
+
+Full name: [Your Full Name]
+Job title / tagline: [Target Role or Professional Tagline]
+Email: [your@email.com]
+Phone: [+1 555 000 0000]
+LinkedIn: [https://linkedin.com/in/yourprofile]
+GitHub / Portfolio: [https://github.com/yourusername]
+Location: [City, Country]
+
+--- PROFESSIONAL SUMMARY (2–3 sentences) ---
+[Describe who you are and what you bring]
+
+--- WORK EXPERIENCE (most recent first) ---
+[Copy this block for each role:]
+Company: [Company Name]
+Title: [Job Title]
+Dates: [Start – End]
+Achievements (3–5 bullets, each starting with a strong action verb):
+- [e.g. Led migration of monolith to microservices, reducing deploy time by 60%]
+- [add more]
+
+--- EDUCATION ---
+[Degree, Institution, Year]
+
+--- SKILLS (grouped) ---
+[Languages: ..., Frameworks: ..., Tools: ...]
+
+--- PROJECTS (optional) ---
+[Name — description — URL]
+
+--- CERTIFICATIONS (optional) ---
+[Name, Year]
+
+STRUCTURE GUIDE — the generated LaTeX should follow this skeleton:
+\\begin{document}
+\\begin{center}
+{\\Huge\\bfseries Name}\\\\
+{\\large Tagline}\\\\[4pt]
+{\\small email $\\bullet$ phone $\\bullet$ location $\\bullet$ \\href{url}{LinkedIn}}
+\\end{center}
+\\rule{\\linewidth}{0.4pt}
+\\rsection{Summary}
+...paragraph...
+\\rsection{Experience}
+\\rjob{Company}{Title}{Dates}
+\\begin{itemize}
+\\item Achievement...
+\\end{itemize}
+...more jobs...
+\\rsection{Education}
+...
+\\rsection{Skills}
+\\begin{tabular}{ll}
+Category & Skill, Skill, Skill \\\\
+\\end{tabular}
+\\end{document}
+
+Now generate the complete LaTeX resume.`,
+  },
+
+  /* ── HTML + TAILWIND — FULL RESUME ─────────────────────────────────── */
+  {
+    id: "html-full",
+    mode: "HTML",
+    title: "Full resume — HTML + Tailwind",
+    description: "Generates a fully styled resume using HTML and Tailwind CSS v3. Includes the exact DOMPurify whitelist, stripped Tailwind variants, and A4 rendering constraints.",
+    prompt: `You are generating a resume in HTML + Tailwind CSS for an app called ResumeForge.
+Copy this prompt, edit every [bracketed placeholder] with your own details, then paste it into any AI (ChatGPT, Claude, Gemini, etc.). Paste the AI output directly into ResumeForge's editor.
+
+═══════════════════════════════════════════════════════════════
+RESUMEFORGE HTML — PARSER, SANITISER & RENDERER CONSTRAINTS
+In HTML mode the app does NOT parse your markup — it passes it through
+directly. However, two processing steps still apply:
+
+1. DOMPURIFY SANITISATION — only these tags survive:
+   h1 h2 h3 h4 h5 h6 p br hr ul ol li strong em b i a span div
+   section header code pre table thead tbody tr td th
+   STRIPPED tags (silently removed):
+   script, style, iframe, img, form, input, button, textarea, select,
+   object, embed, svg, canvas, video, audio, link, meta, base, noscript
+   ALLOWED attributes: href, src, alt, style, class, id, target, data-*
+   Everything else (onclick, onerror, onload, etc.) is removed.
+
+2. TAILWIND CLASS STRIPPING — the app removes classes with these prefixes
+   because they break in the static A4 iframe or PDF:
+   STRIPPED variant prefixes:
+     sm: md: lg: xl: 2xl:                (responsive breakpoints)
+     hover: focus: focus-within:          (interactive states)
+     focus-visible: active: visited:      (interactive states)
+     checked: disabled:                   (form states)
+     dark: print:                         (colour scheme / media)
+     group-hover: group-focus:            (group variants)
+     peer-hover: peer-focus:              (peer variants)
+     motion-safe: motion-reduce:          (motion preferences)
+     selection:                           (selection styling)
+   STRIPPED utility classes:
+     min-h-screen, h-screen, w-screen, min-w-screen, max-h-screen, max-w-screen
+     transition-*, animate-*, duration-*, ease-*, delay-*
+     will-change, cursor-*, scroll-smooth, scroll-auto
+   Any class using these prefixes/patterns is silently removed before rendering.
+
+3. TAILWIND CSS v3 is loaded from CDN (https://cdn.tailwindcss.com).
+   All standard Tailwind v3 utility classes work (except the stripped ones above).
+   JIT arbitrary-value syntax works: text-[10.5px], leading-[1.4], mt-[3mm], bg-[#1a56db].
+═══════════════════════════════════════════════════════════════
+
+OUTPUT FORMAT — follow these rules exactly:
+1. Output ONLY raw HTML body content. No <!DOCTYPE>, <html>, <head>, <body>,
+   <style>, or <script> tags. Just the inner content.
+2. Use Tailwind CSS v3 utility classes for ALL styling.
+3. You MAY use inline style="" for values Tailwind can't express
+   (e.g. style="font-size:10.5px" or style="column-gap:6mm").
+4. Do NOT use any stripped variant prefixes listed above.
+5. Do NOT use <img> unless the user explicitly asks for photos.
+
+PAGE & PRINT CONSTRAINTS:
+- The preview iframe is fixed at A4 width: 794 px (210 mm).
+- A4 height per page: 1123 px (297 mm).
+- Default body font: DM Sans (sans-serif), 11 pt, line-height ~1.4.
+  The user can override the font via the toolbar — your HTML doesn't
+  need to set font-family (but you can if the user asks).
+- Background is always white (#fff) and text defaults to black.
+- print-color-adjust: exact is set, so background colours DO print.
+- For a page break: <div class="page-break"></div>
+  This forces a new A4 page in the PDF export.
+- The PDF is generated via the browser's print dialog (iframe.print()).
+  @media print rules are already injected — you do NOT need to add them.
+- Overflow-x is hidden — content wider than 794 px is clipped.
+
+RECOMMENDED WRAPPER:
+<div class="max-w-[740px] mx-auto px-8 py-8 font-sans text-[11pt] text-gray-900 leading-relaxed">
+  ...all content here...
+</div>
+
+USEFUL PATTERNS:
+- Two-column layout:
+    <div class="grid grid-cols-3 gap-6">
+      <div class="col-span-1">sidebar</div>
+      <div class="col-span-2">main</div>
+    </div>
+- Flex row (company left, date right):
+    <div class="flex justify-between items-baseline">
+      <h3 class="font-semibold">Company</h3>
+      <span class="text-xs text-gray-500">Jan 2021 – Present</span>
+    </div>
+- Pill skill tags:
+    <div class="flex flex-wrap gap-1.5">
+      <span class="px-2 py-0.5 bg-gray-100 rounded text-xs">React</span>
+    </div>
+- Section heading with border:
+    <h2 class="text-sm font-bold uppercase tracking-widest border-b border-gray-300 pb-1 mb-3">Experience</h2>
+- Arbitrary hex colours:
+    class="text-[#1a56db]"   class="bg-[#f0f4ff]"   class="border-[#1a56db]"
+
+═══════════════════════════════════════════════════════════════
+MY DETAILS — edit every [bracket] below, then paste this whole prompt into AI.
+Delete any section you don't need. Add more roles by copying the block.
+═══════════════════════════════════════════════════════════════
+
+Full name: [Your Full Name]
+Job title / tagline: [Target Role]
+Email: [your@email.com]
+Phone: [+1 555 000 0000]
+LinkedIn: [https://linkedin.com/in/yourprofile]
+GitHub / Portfolio: [https://github.com/yourusername]
+Location: [City, Country]
+
+LAYOUT STYLE I WANT:
+[Choose one or describe your own:
+  Option A — Classic single column: name + contact at top, <hr>, sections stacked
+  Option B — Two column: narrow left sidebar (skills, contact, education) + wide right main
+  Option C — Modern accent: coloured left border or top strip, section labels uppercase tracking-widest
+  Option D — Minimal: no borders, generous whitespace, very clean typography
+  Custom: describe your layout here]
+
+COLOUR SCHEME (optional):
+[e.g. "accent #1e40af (dark blue), headings #1e3a5f, body neutral grey" — or leave blank for monochrome]
+
+--- PROFESSIONAL SUMMARY ---
+[2–3 sentences]
+
+--- WORK EXPERIENCE (most recent first) ---
+[Copy this block for each role:]
+Company: [Company Name]
+Title: [Job Title]
+Dates: [Start – End]
+Location: [City or Remote]
+Achievements:
+- [bullet]
+- [bullet]
+
+--- EDUCATION ---
+[Degree, Institution, Year, GPA if notable]
+
+--- SKILLS (grouped) ---
+[Languages: ..., Frameworks: ..., Tools: ..., Soft Skills: ...]
+
+--- PROJECTS (optional) ---
+[Name — description — URL]
+
+--- CERTIFICATIONS (optional) ---
+[Name, Year]
+
+Now generate the complete HTML + Tailwind resume body.`,
+  },
+
+  /* ── MARKDOWN — SINGLE SECTION ─────────────────────────────────────── */
+  {
+    id: "markdown-section",
+    mode: "Markdown",
+    title: "Single section — Markdown",
+    description: "Generates or rewrites just one section of your Markdown resume. Includes parser constraints so the output drops straight into ResumeForge.",
+    prompt: `You are generating a SINGLE SECTION of a Markdown resume for ResumeForge.
+Copy this prompt, edit the [brackets], paste into any AI, then paste the output into your existing resume in ResumeForge's editor.
+
+PARSER CONSTRAINTS (ResumeForge uses marked / GFM + DOMPurify):
+- Output ONLY raw Markdown for this section. No code fences, no explanation.
+- Start with the ## section heading. Do not add other sections.
+- Allowed formatting: **bold**, _italic_, \`code\`, - bullets, 1. numbered,
+  [Label](URL) links, | table | rows |, --- divider.
+- Inline HTML: <span style="...">text</span> is allowed for colour/size overrides.
+- These tags are stripped: <img>, <script>, <iframe>, <form>, <button>, <svg>.
+- Leave a blank line between the heading and the first paragraph/list.
+- Each bullet = one line, no sub-bullets unless asked.
+- Do not invent facts — use [square bracket placeholders] for blanks.
+
+SECTION I WANT: [e.g. Experience / Skills / Summary / Projects / Education / Certifications]
+
+MY CONTENT FOR THIS SECTION:
+[
+  Paste your raw details here, as messy or structured as you like.
+
+  Example — Experience:
+    Company: Acme Corp, Senior Engineer, Jan 2021 – Present
+    - Rebuilt checkout flow, increased conversion 15%
+    - Mentored team of 4 junior engineers
+
+  Example — Skills:
+    JavaScript, TypeScript, React, Next.js, Node.js, PostgreSQL, Docker, AWS, Figma
+]
+
+TONE: [Professional / Concise / Achievement-focused / Entry-level / Executive]
+
+Now generate just this section in Markdown.`,
+  },
+
+  /* ── LATEX — SINGLE SECTION ────────────────────────────────────────── */
+  {
+    id: "latex-section",
+    mode: "LaTeX",
+    title: "Single section — LaTeX",
+    description: "Generates or rewrites just one section using ResumeForge's custom LaTeX commands. Lists every supported command for the section.",
+    prompt: `You are generating a SINGLE SECTION of a LaTeX resume for ResumeForge.
+Copy this prompt, edit the [brackets], paste into any AI, then paste the output into your existing resume in ResumeForge's editor (between \\begin{document} and \\end{document}).
+
+PARSER CONSTRAINTS (ResumeForge uses a custom regex parser, NOT a full LaTeX engine):
+- Output ONLY raw LaTeX for this section. No explanation, no \\begin{document} wrapper.
+- Start with \\rsection{Section Title}.
+- SUPPORTED commands you may use:
+    \\rsection{Title}                       section heading
+    \\rjob{Company}{Title}{Dates}           job entry (for Experience sections)
+    \\textbf{text}  \\textit{text}  \\emph{text}  \\textsc{text}
+    {\\large text}  {\\small text}  {\\footnotesize text}  {\\bfseries text}
+    \\href{url}{label}   \\url{url}
+    \\begin{itemize} \\item ... \\end{itemize}
+    \\begin{enumerate} \\item ... \\end{enumerate}
+    \\begin{tabular}{ll} cell & cell \\\\ \\end{tabular}
+    \\\\  (line break)    ---  (em dash)    --  (en dash)
+    $\\bullet$ (•)   $\\cdot$ (·)   $|$ (|)
+    \\& \\% \\# \\$ \\~ \\,
+    \\rule{\\linewidth}{0.4pt}  (horizontal rule)
+- DO NOT use: \\vspace, \\hspace, \\noindent, \\newcommand, \\minipage, \\parbox,
+  \\multicols, \\tabularx, or any math beyond $\\bullet$/$\\cdot$/$|$.
+- Nested \\item sub-lists are NOT supported.
+- Do not invent facts — use [square bracket placeholders] for blanks.
+
+SECTION I WANT: [e.g. Experience / Skills / Summary / Projects / Education / Certifications]
+
+MY CONTENT FOR THIS SECTION:
+[Paste your raw details here]
+
+TONE: [Professional / Concise / Achievement-focused / Entry-level / Executive]
+
+Now generate just this section in LaTeX.`,
+  },
+
+  /* ── HTML — SINGLE SECTION ─────────────────────────────────────────── */
+  {
+    id: "html-section",
+    mode: "HTML",
+    title: "Single section — HTML + Tailwind",
+    description: "Generates or restyles just one section of your HTML resume. Includes the full DOMPurify whitelist and stripped Tailwind variants.",
+    prompt: `You are generating a SINGLE SECTION of an HTML + Tailwind CSS resume for ResumeForge.
+Copy this prompt, edit the [brackets], paste into any AI, then paste the output into your existing resume in ResumeForge's editor.
+
+SANITISER & RENDERER CONSTRAINTS:
+- Output ONLY raw HTML for the section. No explanation, no <html>/<head>/<body>/<style>/<script>.
+- ALLOWED tags (DOMPurify whitelist):
+    h1 h2 h3 h4 h5 h6 p br hr ul ol li strong em b i a span div
+    section header code pre table thead tbody tr td th
+- STRIPPED tags: script, style, iframe, img, form, input, button, svg, canvas, object, embed
+- ALLOWED attributes: href, src, alt, style, class, id, target, data-*
+- Use Tailwind CSS v3 classes. JIT arbitrary values work: text-[10.5px], bg-[#f0f4ff].
+- STRIPPED Tailwind prefixes (removed before rendering):
+    sm: md: lg: xl: 2xl: hover: focus: active: dark: print:
+    group-hover: peer-hover: motion-safe: motion-reduce: etc.
+- STRIPPED utilities: animate-*, transition-*, duration-*, ease-*,
+    h-screen, w-screen, min-h-screen, cursor-*, scroll-smooth
+- Inline style="" is fine for values Tailwind can't handle.
+- A4 width is 794 px. Do not use viewport-relative units.
+
+SECTION I WANT: [e.g. Experience / Skills / Header / Education / Projects]
+
+STYLE PREFERENCE:
+[e.g. "clean with a left blue border on each job entry" / "two-column skills table" /
+"pill badges for skills" / "match my resume which uses text-gray-900 + accent blue-700"]
+
+MY CONTENT FOR THIS SECTION:
+[Paste your raw details here]
+
+Now generate just this section in HTML + Tailwind.`,
+  },
+];
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  EXPORT — single object for easy import
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const HELP = {
   general:  GENERAL_HELP,
   markdown: MARKDOWN_HELP,
   latex:    LATEX_HELP,
   html:     HTML_HELP,
+  aiPrompts: AI_PROMPTS,
 } as const;

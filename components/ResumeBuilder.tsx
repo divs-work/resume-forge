@@ -6,19 +6,22 @@ import type { SelectedEl } from "@/types/resume";
 import Toolbar from "./Toolbar";
 import ATSPanel from "./ATSPanel";
 import TemplatesPanel from "./TemplatesPanel";
+import HelpPanel from "./HelpPanel";
 import EditorPane from "./EditorPane";
 import PreviewPane from "./PreviewPane";
 
 export default function ResumeBuilder() {
-  const [showAts, setShowATS]       = useState(false);
+  const [showAts, setShowATS]           = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
-  const [exporting, setExporting]   = useState(false);
-  const [focusLine, setFocusLine]   = useState<number | null>(null);
-  const [selectedEl, setSelectedEl] = useState<SelectedEl | null>(null);
+  const [showHelp, setShowHelp]         = useState(false);
+  const [exporting, setExporting]       = useState(false);
+  const [focusLine, setFocusLine]       = useState<number | null>(null);
+  const [selectedEl, setSelectedEl]     = useState<SelectedEl | null>(null);
 
   const closeAll = () => {
     setShowATS(false);
     setShowTemplates(false);
+    setShowHelp(false);
     setSelectedEl(null);
   };
 
@@ -30,6 +33,7 @@ export default function ResumeBuilder() {
     if (showAts) { closeAll(); return; }
     setSelectedEl(null);
     setShowTemplates(false);
+    setShowHelp(false);
     setShowATS(true);
   };
 
@@ -37,12 +41,22 @@ export default function ResumeBuilder() {
     if (showTemplates) { closeAll(); return; }
     setSelectedEl(null);
     setShowATS(false);
+    setShowHelp(false);
     setShowTemplates(true);
+  };
+
+  const handleToggleHelp = () => {
+    if (showHelp) { closeAll(); return; }
+    setSelectedEl(null);
+    setShowATS(false);
+    setShowTemplates(false);
+    setShowHelp(true);
   };
 
   const handleOpenStylePanel = (el: SelectedEl) => {
     setShowATS(false);
     setShowTemplates(false);
+    setShowHelp(false);
     setSelectedEl(el);
   };
 
@@ -55,13 +69,17 @@ export default function ResumeBuilder() {
         onToggleATS={handleToggleATS}
         showTemplates={showTemplates}
         onToggleTemplates={handleToggleTemplates}
+        showHelp={showHelp}
+        onToggleHelp={handleToggleHelp}
         exporting={exporting}
         onExport={handleExport}
         onCloseStylePanel={() => setSelectedEl(null)}
+        onCloseAll={closeAll}
       />
 
       {showAts && <ATSPanel />}
       {showTemplates && <TemplatesPanel />}
+      {showHelp && <HelpPanel />}
 
       <div className="flex flex-1 overflow-hidden min-h-0">
         <EditorPane focusLine={focusLine} onFocusLineHandled={() => setFocusLine(null)} onCloseStylePanel={closeAll} />

@@ -18,9 +18,12 @@ interface ToolbarProps {
   onToggleATS: () => void;
   showTemplates: boolean;
   onToggleTemplates: () => void;
+  showHelp: boolean;
+  onToggleHelp: () => void;
   exporting: boolean;
   onExport: () => void;
   onCloseStylePanel: () => void;
+  onCloseAll: () => void;
 }
 
 export default function Toolbar({
@@ -28,9 +31,12 @@ export default function Toolbar({
   onToggleATS,
   showTemplates,
   onToggleTemplates,
+  showHelp,
+  onToggleHelp,
   exporting,
   onExport,
   onCloseStylePanel,
+  onCloseAll,
 }: ToolbarProps) {
   const mode = useResumeStore((s) => s.mode);
   const setMode = useResumeStore((s) => s.setMode);
@@ -43,15 +49,18 @@ export default function Toolbar({
 
   const atsScore = useMemo(() => checkAts(content).score, [content]);
 
-  const handleMarginChange  = (e: ChangeEvent<HTMLInputElement>) => setTemplateLayout({ marginMm: Number(e.target.value) });
-  const handlePaddingChange = (e: ChangeEvent<HTMLInputElement>) => setTemplateLayout({ paddingMm: Number(e.target.value) });
-  const handleSpacingChange = (e: ChangeEvent<HTMLInputElement>) => setTemplateLayout({ lineHeight: Number(e.target.value) });
-  const handleFontChange    = (e: ChangeEvent<HTMLSelectElement>) => setFontId(e.target.value);
+  const handleMarginChange  = (e: ChangeEvent<HTMLInputElement>)  => { onCloseAll(); setTemplateLayout({ marginMm: Number(e.target.value) }); };
+  const handlePaddingChange = (e: ChangeEvent<HTMLInputElement>)  => { onCloseAll(); setTemplateLayout({ paddingMm: Number(e.target.value) }); };
+  const handleSpacingChange = (e: ChangeEvent<HTMLInputElement>)  => { onCloseAll(); setTemplateLayout({ lineHeight: Number(e.target.value) }); };
+  const handleFontChange    = (e: ChangeEvent<HTMLSelectElement>) => { onCloseAll(); setFontId(e.target.value); };
 
   const templatesBtnCls = showTemplates
     ? `${toolbar.atsActiveBg} ${toolbar.atsActiveText}`
     : `${toolbar.atsInactiveBg} ${toolbar.atsInactiveText}`;
   const atsBtnCls = showAts
+    ? `${toolbar.atsActiveBg} ${toolbar.atsActiveText}`
+    : `${toolbar.atsInactiveBg} ${toolbar.atsInactiveText}`;
+  const helpBtnCls = showHelp
     ? `${toolbar.atsActiveBg} ${toolbar.atsActiveText}`
     : `${toolbar.atsInactiveBg} ${toolbar.atsInactiveText}`;
 
@@ -336,7 +345,7 @@ export default function Toolbar({
             return (
               <button
                 key={m}
-                onClick={() => setMode(m)}
+                onClick={() => { onCloseAll(); setMode(m); }}
                 className={`px-3 py-1.25 rounded-md text-[11px] font-medium transition-all ${btnCls}`}
               >
                 {MODE_CONFIG[m].label}
@@ -431,6 +440,19 @@ export default function Toolbar({
           className={`px-2.5 py-1.25 rounded-lg ${shell.bgMuted} border-none cursor-pointer text-[11px] font-medium ${shell.textMuted}`}
         >
           Reset
+        </button>
+
+        <button
+          onClick={onToggleHelp}
+          className={`flex items-center gap-1 px-2.5 py-1.25 rounded-lg text-[11px] font-semibold border-none cursor-pointer transition-all ${helpBtnCls}`}
+          title="Help & Reference"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="13" height="13">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3" strokeLinecap="round" />
+            <circle cx="12" cy="17" r=".5" fill="currentColor" />
+          </svg>
+          Help
         </button>
 
         <button
