@@ -1,9 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useResumeStore } from "@/store/resume-store";
-import { replaceTextInSource, applyStyleToSource } from "@/lib/source-patcher";
-import { shell } from "@/constant/theme";
+import { useResumeStore } from "@/store/resumeStore";
+import { replaceTextInSource, applyStyleToSource } from "@/helper/sourcePatcher";
+import { shell } from "@/constants/theme";
 import type { SelectedEl } from "@/types/resume";
 
 interface Props {
@@ -26,8 +26,8 @@ export default function StylePanel({ selected, iframeRef, onClose, setFocusLine 
 
   const prevTextRef    = useRef(selected.text);
   const pendingTextRef = useRef(selected.text);
-  const textDebounce   = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const styleDebounce  = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const textDebounceRef   = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const styleDebounceRef  = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   function sendToIframe(msg: object) {
     iframeRef.current?.contentWindow?.postMessage(msg, "*");
@@ -38,10 +38,10 @@ export default function StylePanel({ selected, iframeRef, onClose, setFocusLine 
     pendingTextRef.current = val;
     sendToIframe({ type: "rf-text", elIdx: selected.elIdx, text: val });
 
-    clearTimeout(textDebounce.current ?? undefined);
-    textDebounce.current = setTimeout(() => {
+    clearTimeout(textDebounceRef.current ?? undefined);
+    textDebounceRef.current = setTimeout(() => {
       const store = useResumeStore.getState();
-      const patched = replaceTextInSource(store.content[store.mode], prevTextRef.current, pendingTextRef.current);
+      const patched = replaceTextInSource(store.content[store.mode], prevTextRef.current, pendingTextRef.current, store.mode);
       store.setContent(patched);
       prevTextRef.current = pendingTextRef.current;
     }, 400);
@@ -52,8 +52,8 @@ export default function StylePanel({ selected, iframeRef, onClose, setFocusLine 
     if (!val) return;
     sendToIframe({ type: "rf-style", elIdx: selected.elIdx, styles: { fontSize: `${val}px` } });
 
-    clearTimeout(styleDebounce.current ?? undefined);
-    styleDebounce.current = setTimeout(() => {
+    clearTimeout(styleDebounceRef.current ?? undefined);
+    styleDebounceRef.current = setTimeout(() => {
       const store = useResumeStore.getState();
       const patched = applyStyleToSource(store.content[store.mode], store.mode, prevTextRef.current, { fontSize: `${val}px` });
       store.setContent(patched);
@@ -64,8 +64,8 @@ export default function StylePanel({ selected, iframeRef, onClose, setFocusLine 
     setColor(val);
     sendToIframe({ type: "rf-style", elIdx: selected.elIdx, styles: { color: val } });
 
-    clearTimeout(styleDebounce.current ?? undefined);
-    styleDebounce.current = setTimeout(() => {
+    clearTimeout(styleDebounceRef.current ?? undefined);
+    styleDebounceRef.current = setTimeout(() => {
       const store = useResumeStore.getState();
       const patched = applyStyleToSource(store.content[store.mode], store.mode, prevTextRef.current, { color: val });
       store.setContent(patched);

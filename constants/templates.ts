@@ -5,7 +5,7 @@ import {
   HTML_EDITORIAL,
   HTML_NEO_BRUTALIST,
   HTML_NIGHT_PRO,
-} from "./templates-html";
+} from "./templatesHtml";
 import {
   ACADEMIC_MD_THEME,
   DEFAULT_MD_TEMPLATE,
@@ -13,7 +13,7 @@ import {
   EARTHY_MD_THEME,
   MINIMALIST_MD_THEME,
   MODERN_TECH_MD_THEME,
-} from "./templates-markdown";
+} from "./templatesMarkdown";
 import {
   ACADEMIC_LATEX_THEME,
   DEFAULT_LATEX_TEMPLATE,
@@ -21,7 +21,7 @@ import {
   MODERNCV_LATEX_THEME,
   RES_CLS_LATEX_THEME,
   TUFTE_LATEX_THEME,
-} from "./templates-latex";
+} from "./templatesLatex";
 
 type ContentMap = Record<EditorMode, string>;
 
@@ -33,9 +33,9 @@ export interface TemplateOption {
   theme?: ResumeTheme;
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 // EXPORTS
-// ─────────────────────────────────────────────────────────────────────────────
+// â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
 export const TEMPLATE_STYLES: Record<EditorMode, TemplateOption[]> = {
   html: [
@@ -96,7 +96,7 @@ export const TEMPLATE_STYLES: Record<EditorMode, TemplateOption[]> = {
     {
       id: "modern-tech",
       name: "Modern Tech",
-      description: "Sleek, bold, and high-contrast—designed for developers",
+      description: "Sleek, bold, and high-contrastâ€”designed for developers",
       content: DEFAULT_MD_TEMPLATE,
       theme: MODERN_TECH_MD_THEME,
     },
@@ -149,7 +149,7 @@ export const TEMPLATE_STYLES: Record<EditorMode, TemplateOption[]> = {
   ],
 };
 
-// Backward compat — store's resetTemplate uses TEMPLATES[mode] = first template per set
+// Backward compat â€” store's resetTemplate uses TEMPLATES[mode] = first template per set
 export const TEMPLATES: ContentMap = {
   latex: DEFAULT_LATEX_TEMPLATE,
   markdown: DEFAULT_MD_TEMPLATE,

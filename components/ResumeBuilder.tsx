@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { shell } from "@/constant/theme";
+import { shell } from "@/constants/theme";
 import type { SelectedEl } from "@/types/resume";
 import Toolbar from "./Toolbar";
 import ATSPanel from "./ATSPanel";
@@ -10,7 +10,7 @@ import EditorPane from "./EditorPane";
 import PreviewPane from "./PreviewPane";
 
 export default function ResumeBuilder() {
-  const [showATS, setShowATS]       = useState(false);
+  const [showAts, setShowATS]       = useState(false);
   const [showTemplates, setShowTemplates] = useState(false);
   const [exporting, setExporting]   = useState(false);
   const [focusLine, setFocusLine]   = useState<number | null>(null);
@@ -28,7 +28,7 @@ export default function ResumeBuilder() {
   };
 
   const handleToggleATS = () => {
-    if (showATS) { handleCloseAll(); return; }
+    if (showAts) { handleCloseAll(); return; }
     setShowATS((v) => !v);
   };
 
@@ -42,7 +42,7 @@ export default function ResumeBuilder() {
       className={`flex flex-col h-screen ${shell.bgSubtle} overflow-hidden font-sans`}
     >
       <Toolbar
-        showATS={showATS}
+        showAts={showAts}
         onToggleATS={handleToggleATS}
         showTemplates={showTemplates}
         onToggleTemplates={handleToggleTemplates}
@@ -51,12 +51,12 @@ export default function ResumeBuilder() {
         onCloseStylePanel={handleCloseStylePanel}
       />
 
-      {showATS && <ATSPanel />}
+      {showAts && <ATSPanel />}
       {showTemplates && <TemplatesPanel />}
 
       <div className="flex flex-1 overflow-hidden min-h-0">
         <EditorPane focusLine={focusLine} onFocusLineHandled={() => setFocusLine(null)} onCloseStylePanel={handleCloseStylePanel} />
-        <PreviewPane exporting={exporting} setExportingAction={setExporting} setFocusLine={setFocusLine} selectedEl={selectedEl} setSelectedEl={setSelectedEl} />
+        <PreviewPane exporting={exporting} onExportDone={setExporting} setFocusLine={setFocusLine} selectedEl={selectedEl} setSelectedEl={setSelectedEl} />
       </div>
     </div>
   );

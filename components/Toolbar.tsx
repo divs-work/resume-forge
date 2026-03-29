@@ -1,15 +1,15 @@
 "use client";
 
 import { useMemo, type ChangeEvent } from "react";
-import { useResumeStore } from "@/store/resume-store";
-import { checkATS } from "@/lib/ats";
-import { MODE_CONFIG } from "@/constant/config";
+import { useResumeStore } from "@/store/resumeStore";
+import { checkAts } from "@/helper/ats";
+import { MODE_CONFIG } from "@/constants/config";
 import type { EditorMode } from "@/types/resume";
-import { shell, modeBg, toolbar } from "@/constant/theme";
-import { FONT_OPTIONS } from "@/constant/style-options";
+import { shell, modeBg, toolbar } from "@/constants/theme";
+import { FONT_OPTIONS } from "@/constants/styleOptions";
 
 interface ToolbarProps {
-  showATS: boolean;
+  showAts: boolean;
   onToggleATS: () => void;
   showTemplates: boolean;
   onToggleTemplates: () => void;
@@ -19,7 +19,7 @@ interface ToolbarProps {
 }
 
 export default function Toolbar({
-  showATS,
+  showAts,
   onToggleATS,
   showTemplates,
   onToggleTemplates,
@@ -36,7 +36,7 @@ export default function Toolbar({
   const templateLayout = useResumeStore((s) => s.templateLayout);
   const setTemplateLayout = useResumeStore((s) => s.setTemplateLayout);
 
-  const atsScore = useMemo(() => checkATS(content).score, [content]);
+  const atsScore = useMemo(() => checkAts(content).score, [content]);
 
   const handleMarginChange  = (e: ChangeEvent<HTMLInputElement>) => setTemplateLayout({ marginMm: Number(e.target.value) });
   const handlePaddingChange = (e: ChangeEvent<HTMLInputElement>) => setTemplateLayout({ paddingMm: Number(e.target.value) });
@@ -46,7 +46,7 @@ export default function Toolbar({
   const templatesBtnCls = showTemplates
     ? `${toolbar.atsActiveBg} ${toolbar.atsActiveText}`
     : `${toolbar.atsInactiveBg} ${toolbar.atsInactiveText}`;
-  const atsBtnCls = showATS
+  const atsBtnCls = showAts
     ? `${toolbar.atsActiveBg} ${toolbar.atsActiveText}`
     : `${toolbar.atsInactiveBg} ${toolbar.atsInactiveText}`;
 

@@ -1,11 +1,11 @@
 "use client";
 
 import { useMemo } from "react";
-import { useResumeStore } from "@/store/resume-store";
-import { TEMPLATE_STYLES } from "@/constant/templates";
-import { buildResumeDocument } from "@/lib/document-builder";
-import { MODE_CONFIG, A4_WIDTH_PX, DEFAULT_TEMPLATE_LAYOUT } from "@/constant/config";
-import { shell, modeBg } from "@/constant/theme";
+import { useResumeStore } from "@/store/resumeStore";
+import { TEMPLATE_STYLES } from "@/constants/templates";
+import { buildResumeDocument } from "@/helper/documentBuilder";
+import { MODE_CONFIG, A4_WIDTH_PX, DEFAULT_TEMPLATE_LAYOUT } from "@/constants/config";
+import { shell, modeBg } from "@/constants/theme";
 
 const PREVIEW_H = 560;
 const CARD_W = 168;

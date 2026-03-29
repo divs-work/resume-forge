@@ -1,10 +1,10 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { EditorMode, ResumeTheme, TemplateLayout } from "@/types/resume";
-import { TEMPLATES } from "@/constant/templates";
-import { DEFAULT_LATEX_THEME } from "@/constant/templates-latex";
-import { DEFAULT_MD_THEME } from "@/constant/templates-markdown";
-import { DEFAULT_TEMPLATE_LAYOUT } from "@/constant/config";
+import { TEMPLATES } from "@/constants/templates";
+import { DEFAULT_LATEX_THEME } from "@/constants/templatesLatex";
+import { DEFAULT_MD_THEME } from "@/constants/templatesMarkdown";
+import { DEFAULT_TEMPLATE_LAYOUT } from "@/constants/config";
 
 interface ResumeState {
   mode: EditorMode;

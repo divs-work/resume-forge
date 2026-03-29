@@ -1,8 +1,8 @@
 "use client";
 
-import { useResumeStore } from "@/store/resume-store";
-import { MODE_CONFIG } from "@/constant/config";
-import { editor, modeBg } from "@/constant/theme";
+import { useResumeStore } from "@/store/resumeStore";
+import { MODE_CONFIG } from "@/constants/config";
+import { editor, modeBg } from "@/constants/theme";
 import CodeEditor from "./CodeEditor";
 
 export default function EditorPane({

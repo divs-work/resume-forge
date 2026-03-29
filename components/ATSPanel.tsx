@@ -1,15 +1,15 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useResumeStore } from "@/store/resume-store";
-import { checkATS } from "@/lib/ats";
+import { useResumeStore } from "@/store/resumeStore";
+import { checkAts } from "@/helper/ats";
 import {
   shell,
   atsScore,
   atsBadge,
   atsCategory,
   atsTooltip,
-} from "@/constant/theme";
+} from "@/constants/theme";
 import type { ATSCheck } from "@/types/resume";
 
 const CATEGORY_ORDER = [
@@ -132,7 +132,7 @@ function CategoryCard({
 
 export default function ATSPanel() {
   const content = useResumeStore((s) => s.content[s.mode]);
-  const ats = useMemo(() => checkATS(content), [content]);
+  const ats = useMemo(() => checkAts(content), [content]);
 
   const ringColor =
     ats.score >= 80

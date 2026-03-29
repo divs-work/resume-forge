@@ -3,7 +3,7 @@ import type { ATSCheck } from "@/types/resume";
 interface ATSResult { checks: ATSCheck[]; score: number; }
 
 /*
- * ResumeForge ATS Checker v3 — 2026 Edition
+ * ResumeForge ATS Checker v3 â€” 2026 Edition
  *
  * Sources:
  * - EDLIGO 2025 (1,000 rejected resumes across Workday/Taleo/Greenhouse)
@@ -15,7 +15,7 @@ interface ATSResult { checks: ATSCheck[]; score: number; }
  * - ResumeAdapter ATS Formatting Rules 2026
  */
 
-/* ═══════════════════════ HELPERS ═══════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• HELPERS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 function count(text: string, regex: RegExp): number {
   return (text.match(new RegExp(regex.source, regex.flags)) || []).length;
@@ -48,7 +48,7 @@ function wordCount(text: string): number {
 function extractBullets(text: string): string[] {
   const bullets: string[] = [];
   for (const p of [
-    /^[\s]*[-•*]\s+(.+)$/gm,
+    /^[\s]*[-â€¢*]\s+(.+)$/gm,
     /\\item\s+(.+)/g,
     /<li[^>]*>([\s\S]+?)<\/li>/gi,
   ]) {
@@ -63,7 +63,7 @@ function extractDateRanges(
   text: string,
 ): { start: number; end: number | null }[] {
   const ranges: { start: number; end: number | null }[] = [];
-  const r = /(\d{4})\s*[–\-—to]+\s*(present|current|now|\d{4})/gi;
+  const r = /(\d{4})\s*[â€“\-â€”to]+\s*(present|current|now|\d{4})/gi;
   let m;
   while ((m = r.exec(text)) !== null) {
     const endStr = m[2].toLowerCase();
@@ -77,7 +77,7 @@ function extractDateRanges(
   return ranges;
 }
 
-/* ═══════════════════════ KEYWORD BANKS ═══════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• KEYWORD BANKS â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 const ACTION_VERBS =
   /\b(accelerated|achieved|administered|advanced|analyzed|architected|automated|built|championed|co-founded|collaborated|communicated|configured|consolidated|coordinated|created|debugged|delivered|deployed|designed|developed|directed|documented|drove|eliminated|enabled|engineered|established|evaluated|executed|expanded|facilitated|formulated|founded|generated|grew|headed|identified|implemented|improved|increased|influenced|initiated|innovated|integrated|introduced|investigated|launched|led|maintained|managed|mentored|migrated|modernized|negotiated|operated|optimized|orchestrated|organized|overhauled|partnered|performed|piloted|pioneered|planned|presented|produced|proposed|published|raised|rebuilt|recruited|redesigned|reduced|reengineered|refactored|reformed|researched|resolved|restructured|revamped|reviewed|scaled|secured|simplified|solved|spearheaded|standardized|streamlined|strengthened|supervised|supported|surpassed|tested|trained|transformed|troubleshot|unified|upgraded|validated|verified)\b/gi;
@@ -109,9 +109,9 @@ const JOB_TITLES =
 const INDUSTRY_TERMS =
   /\b(roi|kpi|okr|sla|slo|mvp|poc|saas|paas|iaas|b2b|b2c|erp|crm|cms|lms|hris|ats|sdk|api|ui|ux|qa|iso\s*\d{3,5}|soc\s*[12]|hipaa|gdpr|ccpa|pci\s*dss|owasp|nist|seo|sem|ppc|ctr|ltv|cac|arr|mrr|churn|retention|nps|conversion|funnel|a\/b\s*test|compliance|governance|audit|risk|disaster\s*recovery|business\s*continuity|incident\s*management|change\s*management|capacity\s*planning|high\s*availability|fault\s*tolerance|zero\s*downtime|blue.?green|canary|feature\s*flag|monorepo|microservices|serverless|etl|elt|data\s*pipeline|data\s*warehouse|data\s*lake|olap|oltp|acid|sharding|replication|indexing|schema\s*migration|unit\s*test|integration\s*test|e2e|load\s*test|chaos\s*engineering|observability|monitoring|alerting|logging|tracing|sprint|standup|retrospective|backlog|velocity|story\s*points|epic|user\s*story|roadmap|stakeholder|prd|technical\s*debt|code\s*review|pair\s*programming|post.?mortem|root\s*cause|on.?call|triage)\b/gi;
 
-/* ═══════════════════════ MAIN CHECKER ═══════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• MAIN CHECKER â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-export function checkATS(content: string): ATSResult {
+export function checkAts(content: string): ATSResult {
   const lower = content.toLowerCase();
   const plain = strip(content);
   const wc = wordCount(content);
@@ -184,12 +184,12 @@ export function checkATS(content: string): ATSResult {
     /(?:skills|technologies|tech\s*stack|proficiencies|competencies|expertise)[:\s\n]*\n?([\s\S]{10,3000}?)(?=\n\s*(?:#{1,3}\s|\\section|experience|education|projects|certifications|$))/i,
   );
   const skillTokens = skillsMatch
-    ? skillsMatch[1].split(/[,;|•·\n]/).filter((s) => s.trim().length > 1)
+    ? skillsMatch[1].split(/[,;|â€¢Â·\n]/).filter((s) => s.trim().length > 1)
         .length
     : 0;
 
   const presentInPast =
-    /(?:20[01]\d|201\d|202[0-4])\s*[–\-—]\s*(?:20[01]\d|201\d|202[0-4])[\s\S]{0,400}\b(manage|develop|lead|build|create|design|implement|optimize|deliver|maintain|coordinate|oversee|drive|execute)\b/i.test(
+    /(?:20[01]\d|201\d|202[0-4])\s*[â€“\-â€”]\s*(?:20[01]\d|201\d|202[0-4])[\s\S]{0,400}\b(manage|develop|lead|build|create|design|implement|optimize|deliver|maintain|coordinate|oversee|drive|execute)\b/i.test(
       content,
     );
 
@@ -210,7 +210,7 @@ export function checkATS(content: string): ATSResult {
     );
 
   const checks: ATSCheck[] = [
-    // ═══ CONTACT INFO (6) ═══
+    // â•â•â• CONTACT INFO (6) â•â•â•
     {
       label: "Email address found",
       pass: /[\w.+-]+@[\w.-]+\.\w{2,}/.test(content),
@@ -257,13 +257,13 @@ export function checkATS(content: string): ATSResult {
       category: "Contact Info",
     },
 
-    // ═══ SECTION STRUCTURE (7) ═══
+    // â•â•â• SECTION STRUCTURE (7) â•â•â•
     {
       label: "Summary/Profile section",
       pass: /\b(summary|objective|profile|about\s*me|professional\s*overview|career\s*summary|professional\s*summary|executive\s*summary)\b/.test(
         lower,
       ),
-      tip: "Add a 'Summary' or 'Professional Profile' section at the top. This is your elevator pitch — 2-4 sentences summarizing your value.",
+      tip: "Add a 'Summary' or 'Professional Profile' section at the top. This is your elevator pitch â€” 2-4 sentences summarizing your value.",
       category: "Sections",
     },
     {
@@ -271,7 +271,7 @@ export function checkATS(content: string): ATSResult {
       pass: /\b(experience|work\s*history|employment|professional\s*experience|work\s*experience)\b/.test(
         lower,
       ),
-      tip: "Include a 'Work Experience' or 'Professional Experience' section. Use this exact standard heading — creative names confuse ATS.",
+      tip: "Include a 'Work Experience' or 'Professional Experience' section. Use this exact standard heading â€” creative names confuse ATS.",
       category: "Sections",
     },
     {
@@ -305,11 +305,11 @@ export function checkATS(content: string): ATSResult {
     {
       label: "Sections in logical order",
       pass: isOrdered,
-      tip: "Order sections: Summary → Experience → Education → Skills. This matches what 80% of recruiters expect and what ATS parses most reliably.",
+      tip: "Order sections: Summary â†’ Experience â†’ Education â†’ Skills. This matches what 80% of recruiters expect and what ATS parses most reliably.",
       category: "Sections",
     },
 
-    // ═══ CONTENT QUALITY (14) ═══
+    // â•â•â• CONTENT QUALITY (14) â•â•â•
     {
       label: `Strong action verbs (${verbCount})`,
       pass: verbCount >= 8,
@@ -325,7 +325,7 @@ export function checkATS(content: string): ATSResult {
     {
       label: "Minimal verb repetition",
       pass: repeatedVerbCount <= 3,
-      tip: `You're repeating the same verbs ${repeatedVerbCount} times. Replace duplicates with synonyms — 'developed' → 'engineered', 'built', 'created'.`,
+      tip: `You're repeating the same verbs ${repeatedVerbCount} times. Replace duplicates with synonyms â€” 'developed' â†’ 'engineered', 'built', 'created'.`,
       category: "Content Quality",
     },
     {
@@ -337,7 +337,7 @@ export function checkATS(content: string): ATSResult {
     {
       label: "Rich metrics (5+)",
       pass: metricCount >= 5,
-      tip: "Top resumes have 5+ quantified results. Add %, $, counts, or time savings to more bullets. 'Improved' → 'Improved by 35%'.",
+      tip: "Top resumes have 5+ quantified results. Add %, $, counts, or time savings to more bullets. 'Improved' â†’ 'Improved by 35%'.",
       category: "Content Quality",
     },
     {
@@ -349,7 +349,7 @@ export function checkATS(content: string): ATSResult {
     {
       label: `No weak phrases (${weakCount})`,
       pass: weakCount === 0,
-      tip: "Replace weak phrases: 'Responsible for managing' → 'Managed'. 'Helped with deployment' → 'Deployed'. 'Worked on features' → 'Built features'.",
+      tip: "Replace weak phrases: 'Responsible for managing' â†’ 'Managed'. 'Helped with deployment' â†’ 'Deployed'. 'Worked on features' â†’ 'Built features'.",
       category: "Content Quality",
     },
     {
@@ -361,24 +361,24 @@ export function checkATS(content: string): ATSResult {
     {
       label: `Low passive voice (${passiveCount})`,
       pass: passiveCount <= 3,
-      tip: "Reduce passive voice: 'System was built by me' → 'Built the system'. Active voice scores higher and reads better. Keep under 3 instances.",
+      tip: "Reduce passive voice: 'System was built by me' â†’ 'Built the system'. Active voice scores higher and reads better. Keep under 3 instances.",
       category: "Content Quality",
     },
     {
       label: "Date ranges present",
       pass: dateRanges.length >= 1,
-      tip: "Include date ranges for every role: 'Jan 2022 – Present' or '2022 – 2024'. ATS uses these to calculate years of experience.",
+      tip: "Include date ranges for every role: 'Jan 2022 â€“ Present' or '2022 â€“ 2024'. ATS uses these to calculate years of experience.",
       category: "Content Quality",
     },
     {
       label: "Consistent date formatting",
       pass:
-        count(content, /\d{4}\s*[–\-—]/g) >= 2 ||
+        count(content, /\d{4}\s*[â€“\-â€”]/g) >= 2 ||
         count(
           content,
           /(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\w*\s+\d{4}/gi,
         ) >= 2,
-      tip: "Use one date format throughout: either 'Jan 2022 – Dec 2023' or '2022 – 2023'. Mixing formats confuses parsers.",
+      tip: "Use one date format throughout: either 'Jan 2022 â€“ Dec 2023' or '2022 â€“ 2023'. Mixing formats confuses parsers.",
       category: "Content Quality",
     },
     {
@@ -386,7 +386,7 @@ export function checkATS(content: string): ATSResult {
       pass: !hasGap,
       tip: hasGap
         ? `A ${gapYears}-year gap was detected. Fill it with freelance work, study, volunteering, or add a brief note. 52% of companies auto-filter for gaps.`
-        : "No employment gaps detected. Good — gaps are the #1 automatic ATS filter.",
+        : "No employment gaps detected. Good â€” gaps are the #1 automatic ATS filter.",
       category: "Content Quality",
     },
     {
@@ -403,11 +403,11 @@ export function checkATS(content: string): ATSResult {
           ? "Your summary is too short. Write 2-4 sentences (15-60 words) highlighting your experience level, key skills, and what you bring to a role."
           : sumWords > 60
             ? "Your summary is too long. Cut to 2-4 crisp sentences (15-60 words). Recruiters spend 6-8 seconds on initial scan."
-            : "Summary length is good — 15-60 words is the sweet spot for ATS parsing and recruiter attention.",
+            : "Summary length is good â€” 15-60 words is the sweet spot for ATS parsing and recruiter attention.",
       category: "Content Quality",
     },
 
-    // ═══ BULLET POINT QUALITY (6) ═══
+    // â•â•â• BULLET POINT QUALITY (6) â•â•â•
     {
       label: `Bullet points used (${bullets.length})`,
       pass: bullets.length >= 6,
@@ -435,7 +435,7 @@ export function checkATS(content: string): ATSResult {
     {
       label: `Bullets start with verbs (${bulletVerbStarts}/${bullets.length})`,
       pass: bullets.length === 0 || bulletVerbStarts >= bullets.length * 0.5,
-      tip: "At least 50% of bullets should start with an action verb. 'Built', 'Led', 'Reduced' — not 'The system was...' or 'Responsible for...'.",
+      tip: "At least 50% of bullets should start with an action verb. 'Built', 'Led', 'Reduced' â€” not 'The system was...' or 'Responsible for...'.",
       category: "Bullet Quality",
     },
     {
@@ -449,7 +449,7 @@ export function checkATS(content: string): ATSResult {
       category: "Bullet Quality",
     },
 
-    // ═══ KEYWORDS & SKILLS (7) ═══
+    // â•â•â• KEYWORDS & SKILLS (7) â•â•â•
     {
       label: `Technical keywords (${uniqueTech})`,
       pass: uniqueTech >= 5,
@@ -465,7 +465,7 @@ export function checkATS(content: string): ATSResult {
     {
       label: "Deep tech expertise (15+)",
       pass: uniqueTech >= 15,
-      tip: "Senior roles should show 15+ unique technologies. Include DevOps tools, monitoring, testing frameworks — not just languages and frameworks.",
+      tip: "Senior roles should show 15+ unique technologies. Include DevOps tools, monitoring, testing frameworks â€” not just languages and frameworks.",
       category: "Keywords",
     },
     {
@@ -477,7 +477,7 @@ export function checkATS(content: string): ATSResult {
     {
       label: `No buzzword overload (${buzzCount})`,
       pass: buzzCount <= 2,
-      tip: `Found ${buzzCount} buzzwords like 'ninja', 'rockstar', 'synergy'. Remove them — recruiters and modern ATS penalize fluff. Replace with evidence.`,
+      tip: `Found ${buzzCount} buzzwords like 'ninja', 'rockstar', 'synergy'. Remove them â€” recruiters and modern ATS penalize fluff. Replace with evidence.`,
       category: "Keywords",
     },
     {
@@ -496,7 +496,7 @@ export function checkATS(content: string): ATSResult {
       category: "Keywords",
     },
 
-    // ═══ CREDENTIALS (4) ═══
+    // â•â•â• CREDENTIALS (4) â•â•â•
     {
       label: "Degree listed",
       pass: DEGREES.test(content),
@@ -518,14 +518,14 @@ export function checkATS(content: string): ATSResult {
     {
       label: "Recent dates (2023+)",
       pass: /202[3-9]|203\d|present|current/i.test(content),
-      tip: "Modern ATS applies recency bias — recent experience is weighted more heavily. Make sure your current/latest role shows dates from 2023 or later.",
+      tip: "Modern ATS applies recency bias â€” recent experience is weighted more heavily. Make sure your current/latest role shows dates from 2023 or later.",
       category: "Credentials",
     },
 
-    // ═══ ATS FORMATTING (8) ═══
+    // â•â•â• ATS FORMATTING (8) â•â•â•
     {
       label: "No emojis or special icons",
-      pass: !/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]|[★●◆▪►→✓✗✔✘☑☐⚡🔥💡🚀🎯📌🏠📧📱💼🎓⭐♦♣♠♥•‣⁃∙]/u.test(
+      pass: !/[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]|[â˜…â—â—†â–ªâ–ºâ†’âœ“âœ—âœ”âœ˜â˜‘â˜âš¡ðŸ”¥ðŸ’¡ðŸš€ðŸŽ¯ðŸ“ŒðŸ ðŸ“§ðŸ“±ðŸ’¼ðŸŽ“â­â™¦â™£â™ â™¥â€¢â€£âƒâˆ™]/u.test(
         content,
       ),
       tip: "Remove all emojis and decorative icons. ATS parsers render them as garbled characters or skip the entire line. Use plain text only.",
@@ -575,7 +575,7 @@ export function checkATS(content: string): ATSResult {
       tip:
         skillTokens > 25
           ? `You have ${skillTokens} items in your skills section. EDLIGO found 67% rejection rate for 20+ separate skills. Keep under 25, integrate the rest into experience bullets.`
-          : "Skills section size is good. Keep it focused — quality over quantity.",
+          : "Skills section size is good. Keep it focused â€” quality over quantity.",
       category: "Formatting",
     },
     {
@@ -587,7 +587,7 @@ export function checkATS(content: string): ATSResult {
       category: "Formatting",
     },
 
-    // ═══ LENGTH & DENSITY (4) ═══
+    // â•â•â• LENGTH & DENSITY (4) â•â•â•
     {
       label: `Word count: ${wc}`,
       pass: wc >= 250,
@@ -603,7 +603,7 @@ export function checkATS(content: string): ATSResult {
       tip:
         wc < 350
           ? "Under 350 words looks thin. Each role should have 3-6 bullets with specific achievements. Add quantified results and technical details."
-          : "Good depth — your resume has enough content for ATS to extract meaningful data.",
+          : "Good depth â€” your resume has enough content for ATS to extract meaningful data.",
       category: "Length",
     },
     {
@@ -611,8 +611,8 @@ export function checkATS(content: string): ATSResult {
       pass: wc <= 1000,
       tip:
         wc > 1000
-          ? `At ${wc} words, your resume is too long. Novorésumé recommends under 3 pages. Cut old roles to 2 bullets, remove anything older than 10-15 years.`
-          : "Length is within range. Recruiters spend 6-8 seconds on initial scan — every word should earn its place.",
+          ? `At ${wc} words, your resume is too long. NovorÃ©sumÃ© recommends under 3 pages. Cut old roles to 2 bullets, remove anything older than 10-15 years.`
+          : "Length is within range. Recruiters spend 6-8 seconds on initial scan â€” every word should earn its place.",
       category: "Length",
     },
     {
@@ -621,7 +621,7 @@ export function checkATS(content: string): ATSResult {
       tip:
         wc > 0 && metricCount / (wc / 100) < 0.5
           ? `Only ${(metricCount / (wc / 100)).toFixed(1)} metrics per 100 words. Aim for 0.5+. Replace vague bullets with quantified achievements.`
-          : "Good metric density — your resume is evidence-rich, which modern ATS rewards with higher ranking scores.",
+          : "Good metric density â€” your resume is evidence-rich, which modern ATS rewards with higher ranking scores.",
       category: "Length",
     },
   ];

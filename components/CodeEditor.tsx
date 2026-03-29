@@ -2,14 +2,34 @@
 
 import { useEffect, useRef } from "react";
 import { EditorView, basicSetup } from "codemirror";
-import { EditorState, Compartment } from "@codemirror/state";
+import { EditorState, Compartment, StateEffect, StateField } from "@codemirror/state";
+import { Decoration } from "@codemirror/view";
+import type { DecorationSet, Extension } from "@codemirror/view";
 import { html } from "@codemirror/lang-html";
 import { markdown } from "@codemirror/lang-markdown";
 import { StreamLanguage } from "@codemirror/language";
 import { stex } from "@codemirror/legacy-modes/mode/stex";
 import { oneDark } from "@codemirror/theme-one-dark";
-import type { Extension } from "@codemirror/state";
 import type { EditorMode } from "@/types/resume";
+
+const highlightLineEffect = StateEffect.define<number | null>();
+const highlightLineMark   = Decoration.line({ class: "cm-goto-line" });
+
+const highlightLineField = StateField.define<DecorationSet>({
+  create: () => Decoration.none,
+  update(deco, tr) {
+    deco = deco.map(tr.changes);
+    for (const e of tr.effects) {
+      if (e.is(highlightLineEffect)) {
+        if (e.value === null) return Decoration.none;
+        const line = tr.state.doc.line(e.value);
+        return Decoration.set([highlightLineMark.range(line.from)]);
+      }
+    }
+    return deco;
+  },
+  provide: (f) => EditorView.decorations.from(f),
+});
 
 interface Props {
   value: string;
@@ -34,10 +54,10 @@ function langFor(mode: EditorMode): Extension {
 export default function CodeEditor({ value, onChange, mode, focusLine, onFocusLineHandled }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const viewRef      = useRef<EditorView | null>(null);
-  const langComp     = useRef(new Compartment());
+  const langCompRef     = useRef(new Compartment());
   const onChangeRef  = useRef(onChange);
   const modeRef      = useRef(mode);
-  const skipNext     = useRef(false);
+  const skipNextRef     = useRef(false);
 
   useEffect(() => { onChangeRef.current = onChange; }, [onChange]);
   useEffect(() => { modeRef.current = mode; },         [mode]);
@@ -52,8 +72,14 @@ export default function CodeEditor({ value, onChange, mode, focusLine, onFocusLi
         doc: value,
         extensions: [
           basicSetup,
-          langComp.current.of(langFor(mode)),
+          langCompRef.current.of(langFor(mode)),
           oneDark,
+          highlightLineField,
+          EditorView.domEventHandlers({
+            mousedown(_, view) {
+              view.dispatch({ effects: highlightLineEffect.of(null) });
+            },
+          }),
           EditorView.theme(
             {
               "&":              { height: "100%" },
@@ -69,11 +95,16 @@ export default function CodeEditor({ value, onChange, mode, focusLine, onFocusLi
               ".cm-gutters":          { backgroundColor: "#0d1117", borderRight: "1px solid #30363d" },
               ".cm-activeLineGutter": { backgroundColor: "#161b22" },
               ".cm-cursor, .cm-dropCursor": { borderLeftColor: caretColor },
+              ".cm-goto-line": {
+                backgroundColor: "#1c3a5e",
+                borderLeft:      "3px solid #3b82f6",
+                boxShadow:       "inset 0 0 0 1px #2563eb22",
+              },
             },
             { dark: true }
           ),
           EditorView.updateListener.of((update) => {
-            if (update.docChanged && !skipNext.current) {
+            if (update.docChanged && !skipNextRef.current) {
               onChangeRef.current(update.state.doc.toString());
             }
           }),
@@ -90,7 +121,7 @@ export default function CodeEditor({ value, onChange, mode, focusLine, onFocusLi
   useEffect(() => {
     const view = viewRef.current;
     if (!view) return;
-    view.dispatch({ effects: langComp.current.reconfigure(langFor(mode)) });
+    view.dispatch({ effects: langCompRef.current.reconfigure(langFor(mode)) });
   }, [mode]);
 
   useEffect(() => {
@@ -98,9 +129,9 @@ export default function CodeEditor({ value, onChange, mode, focusLine, onFocusLi
     if (!view) return;
     const doc = view.state.doc.toString();
     if (doc !== value) {
-      skipNext.current = true;
+      skipNextRef.current = true;
       view.dispatch({ changes: { from: 0, to: doc.length, insert: value } });
-      skipNext.current = false;
+      skipNextRef.current = false;
     }
   }, [value]);
 
@@ -111,10 +142,17 @@ export default function CodeEditor({ value, onChange, mode, focusLine, onFocusLi
     const line   = view.state.doc.line(lineNo);
     view.dispatch({
       selection: { anchor: line.from, head: line.from },
-      effects:   EditorView.scrollIntoView(line.from, { y: "center" }),
+      effects: [
+        EditorView.scrollIntoView(line.from, { y: "center" }),
+        highlightLineEffect.of(lineNo),
+      ],
     });
     view.focus();
     onFocusLineHandled();
+    const timer = setTimeout(() => {
+      viewRef.current?.dispatch({ effects: highlightLineEffect.of(null) });
+    }, 2000);
+    return () => clearTimeout(timer);
   }, [focusLine, onFocusLineHandled]);
 
   return <div ref={containerRef} className="w-full h-full" />;
