@@ -111,6 +111,24 @@ export default function CodeEditor({
                 fontFamily: "var(--font-mono, ui-monospace, 'JetBrains Mono', monospace)",
                 fontSize:   EDITOR_FONT_SIZE,
                 lineHeight: EDITOR_LINE_HEIGHT,
+                scrollbarWidth: "thin",
+                scrollbarColor: "#30363d #0d1117",
+              },
+              ".cm-scroller::-webkit-scrollbar": {
+                width: "4px",
+                height: "4px",
+              },
+              ".cm-scroller::-webkit-scrollbar-track": {
+                background: "#0d1117",
+              },
+              ".cm-scroller::-webkit-scrollbar-thumb": {
+                background: "#30363d",
+              },
+              ".cm-scroller::-webkit-scrollbar-thumb:hover": {
+                background: "#484f58",
+              },
+              ".cm-scroller::-webkit-scrollbar-corner": {
+                background: "#0d1117",
               },
               ".cm-content":          { padding: EDITOR_CONTENT_PADDING },
               "&.cm-focused":         { outline: "none" },
