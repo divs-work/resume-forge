@@ -49,20 +49,20 @@ export const EDITOR_CONTENT_PADDING  = "14px 0";
 export const LINE_HIGHLIGHT_MS       = 2000;   // ms — how long the "go to line" highlight stays
 
 export const EDITOR_COLORS = {
-  gutterBg:         "#0d1117",
-  gutterBorder:     "1px solid #30363d",
-  activeLineGutter: "#161b22",
-  caretMarkdown:    "#3b82f6",
-  caretHtml:        "#f97316",
-  caretLatex:       "#ef4444",
-  caretFallback:    "#fff",
-  gotoLineBg:       "#1c3a5e",
-  gotoLineBorder:   "3px solid #3b82f6",
-  gotoLineShadow:   "inset 0 0 0 1px #2563eb22",
+  gutterBg:         "#F5F5F5",
+  gutterBorder:     "1px solid #E0E0E0",
+  activeLineGutter: "#EEEEEE",
+  caretMarkdown:    "#1976D2",
+  caretHtml:        "#F57C00",
+  caretLatex:       "#D32F2F",
+  caretFallback:    "#212121",
+  gotoLineBg:       "#E3F2FD",
+  gotoLineBorder:   "3px solid #1976D2",
+  gotoLineShadow:   "inset 0 0 0 1px #1976D222",
 } as const;
 
 // ── Document builder ──────────────────────────────────────────────────────────
-export const SELECTION_OUTLINE        = "2px solid #3b82f6";
+export const SELECTION_OUTLINE        = "2px solid #1976D2";
 export const SELECTION_OUTLINE_OFFSET = "2px";
 export const TEXT_CONTENT_SLICE       = 500;   // max chars sent in rf-click postMessage
 export const BODY_FONT_SIZE           = "11pt";
