@@ -62,7 +62,7 @@ jobs:
           host: ${{ secrets.GCP_HOST }}
           username: ${{ secrets.GCP_USER }}
           key: ${{ secrets.GCP_SSH_KEY }}
-          script_stop: true
+          request_pty: true
           script: |
             cd ~/resume-forge
             git pull origin main
