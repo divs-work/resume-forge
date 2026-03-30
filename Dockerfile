@@ -17,11 +17,10 @@ RUN npm run build
 # ── 3. Production runner ──────────────────────────────────────────────────────
 FROM base AS runner
 WORKDIR /app
-
 ENV NODE_ENV=production \
     HOSTNAME="0.0.0.0"
 
-# PORT is intentionally not set here — it is passed at runtime via docker-compose
+RUN apk add --no-cache wget   # ← add this
 
 RUN addgroup --system --gid 1001 nodejs \
  && adduser  --system --uid 1001 nextjs
