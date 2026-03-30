@@ -42,8 +42,8 @@ export default function TemplatesPanel() {
         <button
           key={tpl.id}
           onClick={() => handleSelectTemplate(tpl)}
-          className={`group w-full rounded-xl border ${shell.border} overflow-hidden text-left cursor-pointer hover:border-[#484848] transition-all focus:outline-none`}
-          style={{ background: "#141414" }}
+          className={`group w-full rounded-2xl border ${shell.border} overflow-hidden text-left cursor-pointer shadow-[0_1px_3px_rgba(0,0,0,0.08),0_2px_6px_rgba(0,0,0,0.05)] hover:border-[#BDBDBD] hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.12)] transition-all duration-200 focus:outline-none`}
+          style={{ background: "#FAFAFA" }}
         >
           {/* Preview */}
           <div

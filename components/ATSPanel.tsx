@@ -29,7 +29,7 @@ function Tooltip({ label, tip }: { label: string; tip: string }) {
       <div
         className={`absolute -top-1.5 left-4 w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-l-transparent border-r-transparent ${atsTooltip.arrow}`}
       />
-      <div className={`${atsTooltip.bg} rounded-xl shadow-2xl overflow-hidden`}>
+      <div className={`${atsTooltip.bg} rounded-2xl shadow-[0_4px_8px_rgba(0,0,0,0.10),0_8px_24px_rgba(0,0,0,0.08)] overflow-hidden border border-[#E0E0E0]`}>
         <div className={`px-3 py-2 ${atsTooltip.headerBg} border-b ${atsTooltip.headerBorder}`}>
           <p className={`text-[11px] font-semibold ${atsTooltip.titleText}`}>{label}</p>
         </div>
@@ -137,20 +137,21 @@ export default function ATSPanel() {
       {/* Score ring */}
       <div className="flex flex-col items-center gap-2">
         <div className="relative">
-          <svg width="80" height="80" viewBox="0 0 36 36" className="-rotate-90">
-            <circle cx="18" cy="18" r="14.5" fill="none" strokeWidth="2.5" className={atsScore.track} />
+          <svg width="96" height="96" viewBox="0 0 36 36" className="-rotate-90">
+            <circle cx="18" cy="18" r="14.5" fill="none" strokeWidth="2" className={atsScore.track} />
             <circle
-              cx="18" cy="18" r="14.5" fill="none" strokeWidth="3"
+              cx="18" cy="18" r="14.5" fill="none" strokeWidth="2.75"
               className={ringColor}
               strokeDasharray={`${ats.score * 0.91} 100`}
               strokeLinecap="round"
+              style={{ transition: "stroke-dasharray 0.8s cubic-bezier(0.4,0,0.2,1)" }}
             />
           </svg>
-          <span className={`absolute inset-0 flex items-center justify-center text-[17px] font-bold ${shell.text}`}>
-            {ats.score}
-          </span>
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
+            <span className={`text-[20px] font-bold tabular-nums leading-none ${shell.text}`}>{ats.score}</span>
+            <span className={`text-[8px] font-semibold uppercase tracking-wider ${scoreFg}`}>{scoreLabel}</span>
+          </div>
         </div>
-        <p className={`text-[12px] font-semibold ${scoreFg}`}>{scoreLabel}</p>
         <p className={`text-[10px] tabular-nums ${shell.textFaint}`}>
           {totalPassed} / {ats.checks.length} checks passed
         </p>

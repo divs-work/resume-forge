@@ -40,10 +40,10 @@ export default function HelpPanel() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-2.5 py-1 text-[11px] font-medium rounded-md transition-colors whitespace-nowrap ${
+            className={`px-3 py-1 text-[11px] font-medium rounded-full border transition-all duration-150 whitespace-nowrap ${
               activeTab === tab.id
-                ? `${shell.bgRaised} ${shell.text}`
-                : `${shell.textMuted} hover:text-[#c8c8c8] hover:bg-[#1e1e1e]`
+                ? "bg-[#E3F2FD] text-[#1565C0] border-[#BBDEFB]"
+                : `${shell.textMuted} border-[#E0E0E0] hover:text-[#616161] hover:bg-black/[0.04]`
             }`}
           >
             {tab.label}
@@ -145,8 +145,8 @@ function AiPromptsContent() {
             </div>
 
             {expandedId === prompt.id && (
-              <div className={`px-3 py-2 border-t ${shell.border} ${shell.bgMuted}`}>
-                <pre className={`text-[9.5px] ${shell.text} whitespace-pre-wrap break-all font-mono leading-relaxed max-h-40 overflow-y-auto`}>
+              <div className={`border-t ${shell.border} ${shell.bgMuted} max-h-40 overflow-y-auto`}>
+                <pre className={`px-3 py-2 text-[9.5px] ${shell.text} whitespace-pre-wrap break-all font-mono leading-relaxed`}>
                   {prompt.prompt}
                 </pre>
               </div>
@@ -169,10 +169,10 @@ function SectionContent({ section }: { section: HelpSection }) {
           <button
             key={g.heading}
             onClick={() => setOpenGroup(g.heading)}
-            className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-colors whitespace-nowrap ${
+            className={`px-3 py-1 rounded-full border text-[10px] font-medium transition-all duration-150 whitespace-nowrap ${
               openGroup === g.heading
-                ? `${shell.bgRaised} ${shell.text}`
-                : `${shell.textFaint} hover:bg-[#1e1e1e] hover:text-[#a0a0a0]`
+                ? "bg-[#E3F2FD] text-[#1565C0] border-[#BBDEFB]"
+                : `${shell.textFaint} border-[#E0E0E0] hover:bg-black/[0.04] hover:text-[#616161]`
             }`}
           >
             {g.heading}

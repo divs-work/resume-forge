@@ -15,7 +15,6 @@ import { html } from "@codemirror/lang-html";
 import { markdown } from "@codemirror/lang-markdown";
 import { StreamLanguage } from "@codemirror/language";
 import { stex } from "@codemirror/legacy-modes/mode/stex";
-import { oneDark } from "@codemirror/theme-one-dark";
 import type { EditorMode } from "@/types/resume";
 import {
   EDITOR_COLORS,
@@ -95,8 +94,8 @@ export default function CodeEditor({
         doc: value,
         extensions: [
           basicSetup,
+          EditorView.lineWrapping,
           langCompRef.current.of(langFor(mode)),
-          oneDark,
           highlightLineField,
           EditorView.domEventHandlers({
             mousedown(_, view) {
@@ -113,23 +112,24 @@ export default function CodeEditor({
                 fontSize:   EDITOR_FONT_SIZE,
                 lineHeight: EDITOR_LINE_HEIGHT,
                 scrollbarWidth: "thin",
-                scrollbarColor: "#30363d #0d1117",
+                scrollbarColor: "#BDBDBD #F5F5F5",
               },
               ".cm-scroller::-webkit-scrollbar": {
                 width: "4px",
                 height: "4px",
               },
               ".cm-scroller::-webkit-scrollbar-track": {
-                background: "#0d1117",
+                background: "#F5F5F5",
               },
               ".cm-scroller::-webkit-scrollbar-thumb": {
-                background: "#30363d",
+                background: "#BDBDBD",
+                borderRadius: "100px",
               },
               ".cm-scroller::-webkit-scrollbar-thumb:hover": {
-                background: "#484f58",
+                background: "#9E9E9E",
               },
               ".cm-scroller::-webkit-scrollbar-corner": {
-                background: "#0d1117",
+                background: "#F5F5F5",
               },
               ".cm-content":          { padding: EDITOR_CONTENT_PADDING },
               "&.cm-focused":         { outline: "none" },
@@ -142,7 +142,7 @@ export default function CodeEditor({
                 boxShadow:       EDITOR_COLORS.gotoLineShadow,
               },
             },
-            { dark: true }
+            { dark: false }
           ),
           EditorView.updateListener.of((update) => {
             if (update.docChanged && !skipNextRef.current) {
@@ -199,5 +199,5 @@ export default function CodeEditor({
     return () => clearTimeout(timer);
   }, [focusLine, onFocusLineHandledAction]);
 
-  return <div ref={containerRef} className="w-full h-full" />;
+  return <div ref={containerRef} className="absolute inset-0" />;
 }

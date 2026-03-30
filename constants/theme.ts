@@ -1,99 +1,128 @@
 /**
- * UI colour tokens — single source of truth for every colour in the app.
- * All values are static Tailwind class strings so the v4 JIT scanner picks
- * them up here. Components import and reference these; no colour string
- * should appear raw in a component file.
+ * UI colour tokens — single source of truth.
+ * Palette: Material Design 3 — Blue primary
+ * Primary:  #1976D2  |  Surface: #FFFFFF  |  Background: #FAFAFA
  */
 
 // ─── App shell ────────────────────────────────────────────────────────────────
 export const shell = {
-  bg:            "bg-[#0f0f0f]",
-  bgSubtle:      "bg-[#141414]",
-  bgMuted:       "bg-[#1e1e1e]",
-  bgRaised:      "bg-[#2a2a2a]",
-  divider:       "bg-[#242424]",
-  border:        "border-[#272727]",
-  text:          "text-[#e4e4e4]",
-  textSecondary: "text-[#a0a0a0]",
-  textMuted:     "text-[#808080]",
-  textFaint:     "text-[#555555]",
-  textInverse:   "text-[#0f0f0f]",
-  iconStroke:    "stroke-[#555555]",
-  hoverText:     "hover:text-[#c8c8c8]",
+  bg:            "bg-[#FAFAFA]",
+  bgSubtle:      "bg-[#F5F5F5]",
+  bgMuted:       "bg-[#EEEEEE]",
+  bgRaised:      "bg-white",
+  bgGlass:       "bg-black/[0.04]",
+  divider:       "bg-[#E0E0E0]",
+  border:        "border-[#E0E0E0]",
+  text:          "text-[#212121]",
+  textSecondary: "text-[#616161]",
+  textMuted:     "text-[#757575]",
+  textFaint:     "text-[#9E9E9E]",
+  textInverse:   "text-white",
+  iconStroke:    "stroke-[#757575]",
+  hoverText:     "hover:text-[#212121]",
 } as const;
 
-// ─── Editor (dark) ────────────────────────────────────────────────────────────
+// ─── Editor ───────────────────────────────────────────────────────────────────
 export const editor = {
-  barBg:    "bg-[#0c0c0c]",
-  border:   "border-[#1c1c1c]",
-  activeBg: "bg-[#0a0a0a]",
-  mutedText:"text-[#4a4a4a]",
-  text:     "text-[#c9d1d9]",
+  barBg:    "bg-[#F5F5F5]",
+  border:   "border-[#E0E0E0]",
+  activeBg: "bg-white",
+  mutedText:"text-[#9E9E9E]",
+  text:     "text-[#212121]",
+} as const;
+
+// ─── Primary accent (MD Blue 700) ─────────────────────────────────────────────
+export const accent = {
+  bar:    "bg-[#1976D2]",
+  bgFill: "bg-[#E3F2FD]",
+  pill:   "bg-[#E3F2FD] text-[#1565C0]",
+  text:   "text-[#1976D2]",
+  border: "border-[#1976D2]",
+  glow:   "hover:shadow-[0_2px_8px_rgba(25,118,210,0.3)]",
+  grad:   "bg-[#1976D2]",
 } as const;
 
 // ─── Per-mode accents ─────────────────────────────────────────────────────────
 export const modeBg: Record<string, string> = {
-  latex:    "bg-red-500",
-  markdown: "bg-violet-500",
-  html:     "bg-orange-500",
+  latex:    "bg-[#D32F2F]",
+  markdown: "bg-[#1976D2]",
+  html:     "bg-[#F57C00]",
+};
+
+export const modeGradient: Record<string, string> = {
+  latex:    "bg-[#D32F2F]",
+  markdown: "bg-[#1976D2]",
+  html:     "bg-[#F57C00]",
+};
+
+export const modeActivePill: Record<string, string> = {
+  latex:    "bg-[#FFEBEE] text-[#C62828]",
+  markdown: "bg-[#E3F2FD] text-[#1565C0]",
+  html:     "bg-[#FFF3E0] text-[#E65100]",
+};
+
+export const modeExportGlow: Record<string, string> = {
+  latex:    "hover:shadow-[0_2px_8px_rgba(211,47,47,0.45)]",
+  markdown: "hover:shadow-[0_2px_8px_rgba(25,118,210,0.45)]",
+  html:     "hover:shadow-[0_2px_8px_rgba(245,124,0,0.45)]",
 };
 
 // ─── Preview canvas ───────────────────────────────────────────────────────────
 export const canvas = {
-  bg:                "bg-[#161616]",
-  pageLabel:         "text-[#3c3c3c]",
+  bg:                "bg-[#ECEFF1]",
+  pageLabel:         "text-[#BDBDBD]",
   paperBg:           "bg-white",
-  paperShadow:       "shadow-[0_12px_48px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.05)]",
-  breakShadowTop:    "bg-gradient-to-b from-black/30 to-transparent",
-  breakShadowBottom: "bg-gradient-to-t from-black/30 to-transparent",
+  paperShadow:       "shadow-[0_2px_4px_rgba(0,0,0,0.14),0_4px_16px_rgba(0,0,0,0.1)]",
+  breakShadowTop:    "bg-gradient-to-b from-black/[0.08] to-transparent",
+  breakShadowBottom: "bg-gradient-to-t from-black/[0.08] to-transparent",
 } as const;
 
 // ─── ATS score ring ───────────────────────────────────────────────────────────
 export const atsScore = {
-  high:  "stroke-emerald-500",
-  mid:   "stroke-amber-400",
-  low:   "stroke-red-500",
-  track: "stroke-[#2a2a2a]",
+  high:  "stroke-[#388E3C]",
+  mid:   "stroke-[#F57C00]",
+  low:   "stroke-[#D32F2F]",
+  track: "stroke-[#E0E0E0]",
 } as const;
 
 // ─── ATS check badges ─────────────────────────────────────────────────────────
 export const atsBadge = {
-  passBg:     "bg-emerald-950/40",
-  passBorder: "border-emerald-900/50",
-  passText:   "text-emerald-400",
-  passDot:    "bg-emerald-500",
-  failBg:     "bg-red-950/40",
-  failBorder: "border-red-900/50",
-  failText:   "text-red-400",
-  failDot:    "bg-red-500",
-  failHover:  "hover:bg-red-950/60",
+  passBg:     "bg-[#E8F5E9]",
+  passBorder: "border-[#C8E6C9]",
+  passText:   "text-[#2E7D32]",
+  passDot:    "bg-[#388E3C]",
+  failBg:     "bg-[#FFEBEE]",
+  failBorder: "border-[#FFCDD2]",
+  failText:   "text-[#C62828]",
+  failDot:    "bg-[#D32F2F]",
+  failHover:  "hover:bg-[#FFCDD2]",
 } as const;
 
 // ─── ATS category progress ────────────────────────────────────────────────────
 export const atsCategory = {
-  track:        "bg-[#2a2a2a]",
-  barPass:      "bg-emerald-500",
-  barPartial:   "bg-amber-400",
-  barFail:      "bg-red-500",
-  labelPass:    "text-emerald-400",
-  labelPartial: "text-amber-400",
-  labelFail:    "text-red-400",
+  track:        "bg-[#E0E0E0]",
+  barPass:      "bg-[#388E3C]",
+  barPartial:   "bg-[#F57C00]",
+  barFail:      "bg-[#D32F2F]",
+  labelPass:    "text-[#2E7D32]",
+  labelPartial: "text-[#E65100]",
+  labelFail:    "text-[#C62828]",
 } as const;
 
 // ─── ATS tooltip ──────────────────────────────────────────────────────────────
 export const atsTooltip = {
-  bg:          "bg-[#1e1e1e]",
-  headerBg:    "bg-[#161616]",
-  headerBorder:"border-[#2a2a2a]",
-  titleText:   "text-[#e4e4e4]",
-  bodyText:    "text-[#909090]",
-  arrow:       "border-b-[#1e1e1e]",
+  bg:          "bg-white",
+  headerBg:    "bg-[#F5F5F5]",
+  headerBorder:"border-[#E0E0E0]",
+  titleText:   "text-[#212121]",
+  bodyText:    "text-[#757575]",
+  arrow:       "border-b-white",
 } as const;
 
 // ─── Toolbar ──────────────────────────────────────────────────────────────────
 export const toolbar = {
-  atsActiveBg:     "bg-[#e4e4e4]",
-  atsActiveText:   "text-[#0f0f0f]",
-  atsInactiveBg:   "bg-[#1e1e1e]",
-  atsInactiveText: "text-[#808080]",
+  atsActiveBg:     "bg-[#212121]",
+  atsActiveText:   "text-white",
+  atsInactiveBg:   "bg-black/[0.05]",
+  atsInactiveText: "text-[#757575]",
 } as const;
