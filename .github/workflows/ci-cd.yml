@@ -74,5 +74,11 @@ jobs:
               printf '%s=%s\n' "$secret" "$value" >> .env
             done < <(gcloud secrets list --format="value(name)" | sed 's|.*/||')
 
+            # Pre-process nginx template so the image sees a real domain, not '${DOMAIN}'
+            set -a && source .env && set +a
+            envsubst '${DOMAIN} ${APP_PORT}' \
+              < nginx/app.conf.template \
+              > nginx/app.conf
+
             docker compose up --build -d --remove-orphans
             docker image prune -f
