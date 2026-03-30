@@ -9,11 +9,17 @@ services:
     networks:
       - internal
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:${APP_PORT}/"]
+      test:
+        [
+          "CMD",
+          "node",
+          "-e",
+          "require('http').get('http://localhost:${APP_PORT}/', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))",
+        ]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 15s
+      start_period: 30s
 
   nginx:
     image: jonasal/nginx-certbot:latest
@@ -35,7 +41,7 @@ services:
       - internal
 
 volumes:
-  letsencrypt:   # certs persisted across restarts / redeploys
+  letsencrypt: # certs persisted across restarts / redeploys
 
 networks:
   internal:
