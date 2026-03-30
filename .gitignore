@@ -37,6 +37,9 @@ next-env.d.ts
 # zed
 .zed/
 
+# generated nginx config (contains real domain — built from app.conf.template in CI)
+nginx/app.conf
+
 # others
 template.bak
 CODING_STYLE.md
