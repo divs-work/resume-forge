@@ -22,8 +22,8 @@ export default function PreviewPane({
   selectedEl,
   setSelectedElAction,
   onCloseAllAction,
-  onScaleChange,
-  onPageCountChange,
+  onScaleChangeAction,
+  onPageCountChangeAction,
 }: {
   exporting: boolean;
   onExportDoneAction: (n: boolean) => void;
@@ -31,8 +31,8 @@ export default function PreviewPane({
   selectedEl: SelectedEl | null;
   setSelectedElAction: (el: SelectedEl) => void;
   onCloseAllAction: () => void;
-  onScaleChange: (s: number) => void;
-  onPageCountChange: (n: number) => void;
+  onScaleChangeAction: (s: number) => void;
+  onPageCountChangeAction: (n: number) => void;
 }) {
   const [scale,     setScale]     = useState(PREVIEW_INITIAL_SCALE);
   const [pageCount, setPageCount] = useState(1);
@@ -58,8 +58,8 @@ export default function PreviewPane({
     if (!outerRef.current) return;
     const s = (outerRef.current.clientWidth - PREVIEW_CONTAINER_PADDING) / A4_WIDTH_PX;
     setScale(s);
-    onScaleChange(s);
-  }, [onScaleChange]);
+    onScaleChangeAction(s);
+  }, [onScaleChangeAction]);
 
   useEffect(() => {
     if (!outerRef.current) return;
@@ -78,13 +78,13 @@ export default function PreviewPane({
           if (h > PREVIEW_MIN_BODY_HEIGHT) {
             const n = Math.ceil(Math.max(A4_HEIGHT_PX, h) / A4_HEIGHT_PX);
             setPageCount(n);
-            onPageCountChange(n);
+            onPageCountChangeAction(n);
           }
         }
       } catch {}
     }, PREVIEW_POLL_MS);
     return () => clearInterval(poll);
-  }, [docHTML, onPageCountChange]);
+  }, [docHTML, onPageCountChangeAction]);
 
   useEffect(() => {
     if (exporting) {

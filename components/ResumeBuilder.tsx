@@ -131,8 +131,8 @@ export default function ResumeBuilder() {
             selectedEl={selectedEl}
             setSelectedElAction={handleOpenStylePanel}
             onCloseAllAction={closeAll}
-            onScaleChange={setScale}
-            onPageCountChange={setPageCount}
+            onScaleChangeAction={setScale}
+            onPageCountChangeAction={setPageCount}
           />
         </div>
       </div>
