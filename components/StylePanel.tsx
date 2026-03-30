@@ -104,7 +104,7 @@ export default function StylePanel({ selected, iframeRef, onClose, setFocusLineA
       <div className="flex flex-col gap-3 px-3 py-3">
         <div>
           <label className={`block text-[10px] ${shell.textFaint} mb-1`}>Text</label>
-          <input type="text" value={text} onChange={(e) => handleTextChange(e.target.value)} className={inputClass} />
+          <textarea value={text} onChange={(e) => { e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; handleTextChange(e.target.value); }} ref={(el) => { if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }} className={`${inputClass} resize-none overflow-hidden`} rows={1} />
         </div>
 
         <div>
