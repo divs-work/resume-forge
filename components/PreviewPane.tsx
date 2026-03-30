@@ -3,7 +3,6 @@
 import { useMemo, useRef, useEffect, useState, useCallback } from "react";
 import { useResumeStore } from "@/store/resumeStore";
 import {
-  MODE_CONFIG,
   A4_WIDTH_PX,
   A4_HEIGHT_PX,
   PREVIEW_INITIAL_SCALE,
@@ -12,7 +11,7 @@ import {
   PREVIEW_POLL_MS,
 } from "@/constants/config";
 import { buildResumeDocument } from "@/helper/documentBuilder";
-import { shell, canvas } from "@/constants/theme";
+import { canvas } from "@/constants/theme";
 import StylePanel from "./StylePanel";
 import type { SelectedEl } from "@/types/resume";
 
@@ -23,6 +22,8 @@ export default function PreviewPane({
   selectedEl,
   setSelectedElAction,
   onCloseAllAction,
+  onScaleChange,
+  onPageCountChange,
 }: {
   exporting: boolean;
   onExportDoneAction: (n: boolean) => void;
@@ -30,6 +31,8 @@ export default function PreviewPane({
   selectedEl: SelectedEl | null;
   setSelectedElAction: (el: SelectedEl) => void;
   onCloseAllAction: () => void;
+  onScaleChange: (s: number) => void;
+  onPageCountChange: (n: number) => void;
 }) {
   const [scale,     setScale]     = useState(PREVIEW_INITIAL_SCALE);
   const [pageCount, setPageCount] = useState(1);
@@ -45,8 +48,6 @@ export default function PreviewPane({
   const fontId         = useResumeStore((s) => s.fontId);
   const resetKey       = useResumeStore((s) => s.resetKey);
 
-  const cfg = MODE_CONFIG[mode];
-
   const docHTML = useMemo(() => {
     if (mode === "markdown") return buildResumeDocument(content, mode, markdownTheme, fontId, templateLayout);
     if (mode === "latex")    return buildResumeDocument(content, mode, latexTheme, fontId, templateLayout);
@@ -55,8 +56,10 @@ export default function PreviewPane({
 
   const updateScale = useCallback(() => {
     if (!outerRef.current) return;
-    setScale((outerRef.current.clientWidth - PREVIEW_CONTAINER_PADDING) / A4_WIDTH_PX);
-  }, []);
+    const s = (outerRef.current.clientWidth - PREVIEW_CONTAINER_PADDING) / A4_WIDTH_PX;
+    setScale(s);
+    onScaleChange(s);
+  }, [onScaleChange]);
 
   useEffect(() => {
     if (!outerRef.current) return;
@@ -72,12 +75,16 @@ export default function PreviewPane({
         const body = iframeRef.current?.contentDocument?.body;
         if (body) {
           const h = body.scrollHeight;
-          if (h > PREVIEW_MIN_BODY_HEIGHT) setPageCount(Math.ceil(Math.max(A4_HEIGHT_PX, h) / A4_HEIGHT_PX));
+          if (h > PREVIEW_MIN_BODY_HEIGHT) {
+            const n = Math.ceil(Math.max(A4_HEIGHT_PX, h) / A4_HEIGHT_PX);
+            setPageCount(n);
+            onPageCountChange(n);
+          }
         }
       } catch {}
     }, PREVIEW_POLL_MS);
     return () => clearInterval(poll);
-  }, [docHTML]);
+  }, [docHTML, onPageCountChange]);
 
   useEffect(() => {
     if (exporting) {
@@ -120,51 +127,15 @@ export default function PreviewPane({
 
   return (
     <div className="flex min-w-0 flex-1">
-      <div className="flex flex-col min-w-0 flex-1">
-      <div
-        className={`flex items-center justify-between px-4 py-1.5 ${shell.bgSubtle} border-b ${shell.border} shrink-0`}
-      >
-        <div className="flex items-center gap-1.5">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            className={shell.iconStroke}
-            strokeWidth="1.5"
-            width="13"
-            height="13"
-          >
-            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
-          <span className={`text-[11px] font-semibold ${shell.textMuted}`}>
-            Preview
-          </span>
-          <span className={`text-[10px] ${shell.textFaint}`}>
-            — {cfg.label}
-          </span>
-        </div>
-        <span className={`text-[10px] ${shell.textFaint}`}>
-          {pageCount} page{pageCount !== 1 ? "s" : ""} &bull; A4 &bull;{" "}
-          {Math.round(scale * 100)}%
-        </span>
-      </div>
-
       <div
         ref={outerRef}
         onClick={handleClosePanel}
-        className={`flex-1 overflow-auto ${canvas.bg}`}
-        style={
-          {
-            "--scale": scale,
-            "--total-h": `${totalPaperH}px`,
-          } as React.CSSProperties
-        }
+        className={`flex-1 overflow-auto ${canvas.bg} min-w-0`}
+        style={{ "--scale": scale, "--total-h": `${totalPaperH}px` } as React.CSSProperties}
       >
-        <div className="py-6 flex justify-center">
+        <div className="py-8 flex justify-center">
           <div className="relative shrink-0 overflow-hidden w-[calc(794px*var(--scale))] h-[calc(var(--total-h)*var(--scale))]">
-            <div
-              className={`absolute inset-0 ${canvas.paperBg} rounded-sm ${canvas.paperShadow}`}
-            />
+            <div className={`absolute inset-0 ${canvas.paperBg} rounded-sm ${canvas.paperShadow}`} />
 
             <iframe
               key={resetKey}
@@ -182,18 +153,12 @@ export default function PreviewPane({
                 style={{ "--y": `${y}px` } as React.CSSProperties}
                 className="absolute left-0 right-0 h-0 z-10 top-[calc(var(--y)*var(--scale))]"
               >
-                <div
-                  className={`w-full h-[calc(8px*var(--scale))] ${canvas.bg} -translate-y-1/2 relative`}
-                >
-                  <div
-                    className={`absolute top-0 inset-x-0 h-0.75 ${canvas.breakShadowTop}`}
-                  />
-                  <div
-                    className={`absolute bottom-0 inset-x-0 h-0.75 ${canvas.breakShadowBottom}`}
-                  />
+                <div className={`w-full h-[calc(8px*var(--scale))] ${canvas.bg} -translate-y-1/2 relative`}>
+                  <div className={`absolute top-0 inset-x-0 h-0.75 ${canvas.breakShadowTop}`} />
+                  <div className={`absolute bottom-0 inset-x-0 h-0.75 ${canvas.breakShadowBottom}`} />
                 </div>
                 <div
-                  className={`absolute top-1/2 -translate-y-1/2 right-[calc(-36px*var(--scale))] text-[calc(9px*var(--scale))] ${canvas.pageLabel} whitespace-nowrap`}
+                  className={`absolute top-1/2 -translate-y-1/2 right-[calc(-36px*var(--scale))] text-[calc(9px*var(--scale))] ${canvas.pageLabel} whitespace-nowrap font-mono`}
                 >
                   p.{i + 2}
                 </div>
@@ -202,7 +167,7 @@ export default function PreviewPane({
           </div>
         </div>
       </div>
-      </div>
+
       {selectedEl && (
         <StylePanel
           key={selectedEl.elIdx}

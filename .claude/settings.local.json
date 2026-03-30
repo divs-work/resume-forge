@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(find /s/Projects/resume-forge -not -path */node_modules/* -type d)"
+      "Bash(find /s/Projects/resume-forge -not -path */node_modules/* -type d)",
+      "Bash(find /s/Projects/resume-forge -maxdepth 2 -type d -not -path */.* -not -path */node_modules*)"
     ]
   }
 }

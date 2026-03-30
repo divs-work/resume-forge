@@ -12,41 +12,38 @@ import {
 import type { HelpSection, AiPrompt } from "@/constants/help";
 
 const TABS = [
-  { id: "general", label: "Getting Started" },
+  { id: "general",  label: "Guide"    },
   { id: "markdown", label: "Markdown" },
-  { id: "latex", label: "LaTeX" },
-  { id: "html", label: "HTML + Tailwind" },
-  { id: "ai", label: "AI Prompts" },
+  { id: "latex",    label: "LaTeX"    },
+  { id: "html",     label: "HTML"     },
+  { id: "ai",       label: "AI"       },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
 
 const SECTION_MAP: Record<Exclude<TabId, "general" | "ai">, HelpSection> = {
   markdown: MARKDOWN_HELP,
-  latex: LATEX_HELP,
-  html: HTML_HELP,
+  latex:    LATEX_HELP,
+  html:     HTML_HELP,
 };
 
 export default function HelpPanel() {
   const [activeTab, setActiveTab] = useState<TabId>("general");
 
   return (
-    <div
-      className={`border-b ${shell.border} ${shell.bg} overflow-hidden`}
-      style={{ maxHeight: "42vh" }}
-    >
-      {/* Tab bar */}
+    <div className="flex flex-col">
+      {/* Tab bar — wraps to next line on narrow widths */}
       <div
-        className={`flex items-center gap-0.5 px-3 pt-2 border-b ${shell.border} ${shell.bgSubtle}`}
+        className={`flex flex-wrap gap-1 px-2 pt-2 pb-1.5 border-b ${shell.border} ${shell.bgSubtle}`}
       >
         {TABS.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-3 py-1.5 text-[11px] font-medium rounded-t transition-colors ${
+            className={`px-2.5 py-1 text-[11px] font-medium rounded-md transition-colors whitespace-nowrap ${
               activeTab === tab.id
-                ? `${shell.text} bg-white border border-b-0 ${shell.border}`
-                : `${shell.textMuted} hover:${shell.text}`
+                ? `${shell.bgRaised} ${shell.text}`
+                : `${shell.textMuted} hover:text-[#c8c8c8] hover:bg-[#1e1e1e]`
             }`}
           >
             {tab.label}
@@ -55,58 +52,49 @@ export default function HelpPanel() {
       </div>
 
       {/* Content */}
-      <div
-        className="overflow-y-auto"
-        style={{ maxHeight: "calc(42vh - 36px)" }}
-      >
-        {activeTab === "general" ? (
-          <div className="px-6 py-4">
-            {GENERAL_HELP.split("\n\n").map((block, i) => {
-              const lines = block.split("\n");
-              const heading = lines[0].match(/^[A-Z][A-Z\s]+$/);
-              if (heading) {
-                return (
-                  <div key={i} className="mb-3 mt-4 first:mt-0">
-                    <h3
-                      className={`text-[11px] font-bold uppercase tracking-widest ${shell.textMuted} mb-2`}
-                    >
-                      {lines[0]}
-                    </h3>
-                    {lines.slice(1).map((l, j) => (
-                      <p
-                        key={j}
-                        className={`text-[12px] ${shell.text} leading-relaxed`}
-                      >
-                        {l.replace(/^  /, "")}
-                      </p>
-                    ))}
-                  </div>
-                );
-              }
-              return (
-                <p
-                  key={i}
-                  className={`text-[12px] ${shell.text} leading-relaxed mb-2`}
-                >
-                  {block}
+      {activeTab === "general" ? (
+        <GeneralContent />
+      ) : activeTab === "ai" ? (
+        <AiPromptsContent />
+      ) : (
+        <SectionContent section={SECTION_MAP[activeTab as Exclude<TabId, "general" | "ai">]} />
+      )}
+    </div>
+  );
+}
+
+function GeneralContent() {
+  return (
+    <div className="px-4 py-4">
+      {GENERAL_HELP.split("\n\n").map((block, i) => {
+        const lines = block.split("\n");
+        const heading = lines[0].match(/^[A-Z][A-Z\s]+$/);
+        if (heading) {
+          return (
+            <div key={i} className="mb-3 mt-4 first:mt-0">
+              <h3 className={`text-[10px] font-bold uppercase tracking-widest ${shell.textMuted} mb-1.5`}>
+                {lines[0]}
+              </h3>
+              {lines.slice(1).map((l, j) => (
+                <p key={j} className={`text-[11.5px] ${shell.text} leading-relaxed`}>
+                  {l.replace(/^  /, "")}
                 </p>
-              );
-            })}
-          </div>
-        ) : activeTab === "ai" ? (
-          <AiPromptsContent />
-        ) : (
-          <SectionContent
-            section={SECTION_MAP[activeTab as Exclude<TabId, "general" | "ai">]}
-          />
-        )}
-      </div>
+              ))}
+            </div>
+          );
+        }
+        return (
+          <p key={i} className={`text-[11.5px] ${shell.text} leading-relaxed mb-2`}>
+            {block}
+          </p>
+        );
+      })}
     </div>
   );
 }
 
 function AiPromptsContent() {
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copiedId, setCopiedId]     = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
 
   const handleCopy = async (prompt: AiPrompt) => {
@@ -116,78 +104,49 @@ function AiPromptsContent() {
   };
 
   return (
-    <div className="px-6 py-4">
-      <div className="mb-4">
-        <h3
-          className={`text-[11px] font-bold uppercase tracking-widest ${shell.textMuted} mb-1`}
-        >
-          AI-Powered Resume Generation
-        </h3>
-        <p className={`text-[12px] ${shell.text} leading-relaxed`}>
-          Copy any prompt below, edit the{" "}
-          <code
-            className={`text-[11px] font-mono ${shell.bgMuted} px-1 py-0.5 rounded`}
-          >
-            [bracketed fields]
-          </code>{" "}
-          with your own details, and paste it into any AI assistant (ChatGPT,
-          Claude, Gemini, etc.) to generate a ready-to-use resume. Then paste
-          the AI output straight into ResumeForge&apos;s editor.
-        </p>
-      </div>
+    <div className="px-4 py-4">
+      <p className={`text-[11px] ${shell.textMuted} leading-relaxed mb-4`}>
+        Copy a prompt, fill in the{" "}
+        <code className={`text-[10px] font-mono ${shell.bgMuted} px-1 py-0.5 rounded`}>
+          [bracketed fields]
+        </code>{" "}
+        and paste into any AI assistant.
+      </p>
 
-      <div className="space-y-3">
+      <div className="space-y-2">
         {AI_PROMPTS.map((prompt) => (
-          <div
-            key={prompt.id}
-            className={`border ${shell.border} rounded-lg overflow-hidden`}
-          >
-            {/* Header row */}
-            <div
-              className={`flex items-center justify-between px-3 py-2 ${shell.bgSubtle}`}
-            >
+          <div key={prompt.id} className={`border ${shell.border} rounded-lg overflow-hidden`}>
+            <div className={`flex items-center justify-between gap-2 px-3 py-2 ${shell.bgSubtle}`}>
               <div className="flex items-center gap-2 min-w-0">
-                <span
-                  className={`shrink-0 text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${shell.bgMuted} ${shell.textMuted}`}
-                >
+                <span className={`shrink-0 text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded ${shell.bgMuted} ${shell.textFaint}`}>
                   {prompt.mode}
                 </span>
                 <button
-                  onClick={() =>
-                    setExpandedId(expandedId === prompt.id ? null : prompt.id)
-                  }
-                  className={`text-[12px] font-semibold ${shell.text} hover:underline truncate text-left`}
+                  onClick={() => setExpandedId(expandedId === prompt.id ? null : prompt.id)}
+                  className={`text-[11px] font-semibold ${shell.text} hover:underline truncate text-left`}
                 >
                   {prompt.title}
                 </button>
               </div>
               <button
                 onClick={() => handleCopy(prompt)}
-                className={`shrink-0 ml-2 px-2.5 py-1 text-[10px] font-medium rounded transition-colors ${
+                className={`shrink-0 px-2 py-0.5 text-[9.5px] font-medium rounded transition-colors ${
                   copiedId === prompt.id
-                    ? "bg-green-100 text-green-700"
-                    : `${shell.bgMuted} ${shell.textMuted} hover:${shell.text}`
+                    ? "bg-emerald-950/40 text-emerald-400"
+                    : `${shell.bgMuted} ${shell.textMuted} hover:text-[#c8c8c8]`
                 }`}
               >
-                {copiedId === prompt.id ? "Copied!" : "Copy Prompt"}
+                {copiedId === prompt.id ? "✓" : "Copy"}
               </button>
             </div>
 
-            {/* Description */}
             <div className={`px-3 py-1.5 border-t ${shell.border}`}>
-              <p className={`text-[11px] ${shell.textMuted} leading-relaxed`}>
-                {prompt.description}
-              </p>
+              <p className={`text-[10.5px] ${shell.textMuted} leading-relaxed`}>{prompt.description}</p>
             </div>
 
-            {/* Expandable prompt preview */}
             {expandedId === prompt.id && (
-              <div
-                className={`px-3 py-2 border-t ${shell.border} ${shell.bgMuted}`}
-              >
-                <pre
-                  className={`text-[10px] ${shell.text} whitespace-pre-wrap wrap-break-word font-mono leading-relaxed max-h-50 overflow-y-auto`}
-                >
+              <div className={`px-3 py-2 border-t ${shell.border} ${shell.bgMuted}`}>
+                <pre className={`text-[9.5px] ${shell.text} whitespace-pre-wrap break-all font-mono leading-relaxed max-h-40 overflow-y-auto`}>
                   {prompt.prompt}
                 </pre>
               </div>
@@ -200,29 +159,20 @@ function AiPromptsContent() {
 }
 
 function SectionContent({ section }: { section: HelpSection }) {
-  const [openGroup, setOpenGroup] = useState<string | null>(
-    section.groups[0]?.heading ?? null
-  );
+  const [openGroup, setOpenGroup] = useState<string | null>(section.groups[0]?.heading ?? null);
 
   return (
-    <div className="flex gap-0 h-full">
-      {/* Sidebar: group list */}
-      <div
-        className={`w-44 shrink-0 border-r ${shell.border} ${shell.bgSubtle} py-2`}
-      >
-        <p
-          className={`px-3 pb-2 text-[10px] ${shell.textFaint} leading-relaxed`}
-        >
-          {section.intro.split("\n")[0]}
-        </p>
+    <div>
+      {/* Group selector — wraps */}
+      <div className={`flex flex-wrap gap-1 px-3 py-2 border-b ${shell.border}`}>
         {section.groups.map((g) => (
           <button
             key={g.heading}
             onClick={() => setOpenGroup(g.heading)}
-            className={`w-full text-left px-3 py-1.5 text-[11px] transition-colors ${
+            className={`px-2.5 py-1 rounded-md text-[10px] font-medium transition-colors whitespace-nowrap ${
               openGroup === g.heading
-                ? `font-semibold ${shell.text} bg-white/60`
-                : `${shell.textMuted} hover:${shell.text}`
+                ? `${shell.bgRaised} ${shell.text}`
+                : `${shell.textFaint} hover:bg-[#1e1e1e] hover:text-[#a0a0a0]`
             }`}
           >
             {g.heading}
@@ -230,66 +180,23 @@ function SectionContent({ section }: { section: HelpSection }) {
         ))}
       </div>
 
-      {/* Main: items table */}
-      <div className="flex-1 overflow-y-auto px-4 py-3">
+      {/* Items as cards */}
+      <div className="px-3 py-3 space-y-2">
         {section.groups
           .filter((g) => g.heading === openGroup)
-          .map((g) => (
-            <div key={g.heading}>
-              <table className="w-full text-[12px] border-collapse">
-                <thead>
-                  <tr className={`border-b ${shell.border}`}>
-                    <th
-                      className={`text-left pb-1.5 pr-4 text-[10px] uppercase tracking-wider font-semibold ${shell.textFaint} w-1/4`}
-                    >
-                      Command
-                    </th>
-                    <th
-                      className={`text-left pb-1.5 pr-4 text-[10px] uppercase tracking-wider font-semibold ${shell.textFaint} w-1/3`}
-                    >
-                      Syntax
-                    </th>
-                    <th
-                      className={`text-left pb-1.5 text-[10px] uppercase tracking-wider font-semibold ${shell.textFaint}`}
-                    >
-                      What it does
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {g.items.map((item, i) => (
-                    <tr
-                      key={i}
-                      className={`border-b ${shell.border} last:border-0`}
-                    >
-                      <td
-                        className={`py-2 pr-4 font-medium ${shell.text} align-top`}
-                      >
-                        {item.label}
-                      </td>
-                      <td className="py-2 pr-4 align-top">
-                        <code
-                          className={`text-[11px] font-mono ${shell.bgMuted} px-1.5 py-0.5 rounded whitespace-pre-wrap break-all ${shell.textMuted}`}
-                        >
-                          {item.syntax}
-                        </code>
-                        {item.note && (
-                          <p
-                            className={`mt-1 text-[10px] ${shell.textFaint} italic`}
-                          >
-                            {item.note}
-                          </p>
-                        )}
-                      </td>
-                      <td
-                        className={`py-2 ${shell.textMuted} align-top leading-relaxed`}
-                      >
-                        {item.result}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          .flatMap((g) => g.items)
+          .map((item, i) => (
+            <div key={i} className={`rounded-lg border ${shell.border} ${shell.bgSubtle} px-3 py-2.5`}>
+              <div className="flex items-start justify-between gap-2 mb-1.5">
+                <span className={`text-[11px] font-semibold ${shell.text}`}>{item.label}</span>
+                <code className={`text-[9.5px] font-mono ${shell.bgMuted} px-1.5 py-0.5 rounded shrink-0 ${shell.textMuted} max-w-[120px] truncate`}>
+                  {item.syntax}
+                </code>
+              </div>
+              <p className={`text-[10.5px] ${shell.textMuted} leading-relaxed`}>{item.result}</p>
+              {item.note && (
+                <p className={`mt-1 text-[9.5px] ${shell.textFaint} italic`}>{item.note}</p>
+              )}
             </div>
           ))}
       </div>

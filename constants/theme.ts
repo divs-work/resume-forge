@@ -7,94 +7,93 @@
 
 // ─── App shell ────────────────────────────────────────────────────────────────
 export const shell = {
-  bg:            "bg-white",
-  bgSubtle:      "bg-gray-50",    // panels, headers, app container
-  bgMuted:       "bg-gray-100",   // button groups, secondary surfaces
-  divider:       "bg-gray-200",   // thin vertical dividers
-  border:        "border-gray-200",
-  text:          "text-gray-900",
-  textSecondary: "text-gray-600",
-  textMuted:     "text-gray-500",
-  textFaint:     "text-gray-400",
-  textInverse:   "text-white",
-  iconStroke:    "stroke-gray-400",
-  hoverText:     "hover:text-gray-700",
+  bg:            "bg-[#0f0f0f]",
+  bgSubtle:      "bg-[#141414]",
+  bgMuted:       "bg-[#1e1e1e]",
+  bgRaised:      "bg-[#2a2a2a]",
+  divider:       "bg-[#242424]",
+  border:        "border-[#272727]",
+  text:          "text-[#e4e4e4]",
+  textSecondary: "text-[#a0a0a0]",
+  textMuted:     "text-[#808080]",
+  textFaint:     "text-[#555555]",
+  textInverse:   "text-[#0f0f0f]",
+  iconStroke:    "stroke-[#555555]",
+  hoverText:     "hover:text-[#c8c8c8]",
 } as const;
 
-// ─── Editor (dark GitHub-style) ───────────────────────────────────────────────
+// ─── Editor (dark) ────────────────────────────────────────────────────────────
 export const editor = {
-  barBg:    "bg-[#161b22]",
-  border:   "border-[#30363d]",
-  activeBg: "bg-[#0d1117]",
-  mutedText:"text-[#8b949e]",
+  barBg:    "bg-[#0c0c0c]",
+  border:   "border-[#1c1c1c]",
+  activeBg: "bg-[#0a0a0a]",
+  mutedText:"text-[#4a4a4a]",
   text:     "text-[#c9d1d9]",
 } as const;
 
 // ─── Per-mode accents ─────────────────────────────────────────────────────────
 export const modeBg: Record<string, string> = {
-  latex:    "bg-red-600",
-  markdown: "bg-blue-600",
-  html:     "bg-orange-600",
+  latex:    "bg-red-500",
+  markdown: "bg-violet-500",
+  html:     "bg-orange-500",
 };
-
-
 
 // ─── Preview canvas ───────────────────────────────────────────────────────────
 export const canvas = {
-  bg:                "bg-[#d4d4d4]",
-  pageLabel:         "text-[#999]",
+  bg:                "bg-[#161616]",
+  pageLabel:         "text-[#3c3c3c]",
   paperBg:           "bg-white",
-  paperShadow:       "shadow-[0_2px_8px_rgba(0,0,0,0.15),0_0_1px_rgba(0,0,0,0.1)]",
-  breakShadowTop:    "bg-gradient-to-b from-black/8 to-transparent",
-  breakShadowBottom: "bg-gradient-to-t from-black/8 to-transparent",
+  paperShadow:       "shadow-[0_12px_48px_rgba(0,0,0,0.7),0_0_0_1px_rgba(255,255,255,0.05)]",
+  breakShadowTop:    "bg-gradient-to-b from-black/30 to-transparent",
+  breakShadowBottom: "bg-gradient-to-t from-black/30 to-transparent",
 } as const;
 
 // ─── ATS score ring ───────────────────────────────────────────────────────────
 export const atsScore = {
-  high:  "stroke-green-500",  // >= 80
-  mid:   "stroke-yellow-500", // >= 50
-  low:   "stroke-red-500",    // <  50
-  track: "stroke-gray-200",   // background track
+  high:  "stroke-emerald-500",
+  mid:   "stroke-amber-400",
+  low:   "stroke-red-500",
+  track: "stroke-[#2a2a2a]",
 } as const;
 
 // ─── ATS check badges ─────────────────────────────────────────────────────────
 export const atsBadge = {
-  passBg:     "bg-green-50",
-  passBorder: "border-green-100",
-  passText:   "text-green-700",
-  passDot:    "bg-green-400",
-  failBg:     "bg-red-50",
-  failBorder: "border-red-100",
-  failText:   "text-red-600",
-  failDot:    "bg-red-400",
-  failHover:  "hover:bg-red-100",
+  passBg:     "bg-emerald-950/40",
+  passBorder: "border-emerald-900/50",
+  passText:   "text-emerald-400",
+  passDot:    "bg-emerald-500",
+  failBg:     "bg-red-950/40",
+  failBorder: "border-red-900/50",
+  failText:   "text-red-400",
+  failDot:    "bg-red-500",
+  failHover:  "hover:bg-red-950/60",
 } as const;
 
 // ─── ATS category progress ────────────────────────────────────────────────────
 export const atsCategory = {
-  track:       "bg-gray-100",
-  barPass:     "bg-green-400",
-  barPartial:  "bg-yellow-400",
-  barFail:     "bg-red-400",
-  labelPass:   "text-green-600",
-  labelPartial:"text-yellow-600",
-  labelFail:   "text-red-500",
+  track:        "bg-[#2a2a2a]",
+  barPass:      "bg-emerald-500",
+  barPartial:   "bg-amber-400",
+  barFail:      "bg-red-500",
+  labelPass:    "text-emerald-400",
+  labelPartial: "text-amber-400",
+  labelFail:    "text-red-400",
 } as const;
 
 // ─── ATS tooltip ──────────────────────────────────────────────────────────────
 export const atsTooltip = {
-  bg:         "bg-gray-900",
-  headerBg:   "bg-gray-800",
-  headerBorder:"border-gray-700",
-  titleText:  "text-white",
-  bodyText:   "text-gray-300",
-  arrow:      "border-b-gray-900",
+  bg:          "bg-[#1e1e1e]",
+  headerBg:    "bg-[#161616]",
+  headerBorder:"border-[#2a2a2a]",
+  titleText:   "text-[#e4e4e4]",
+  bodyText:    "text-[#909090]",
+  arrow:       "border-b-[#1e1e1e]",
 } as const;
 
 // ─── Toolbar ──────────────────────────────────────────────────────────────────
 export const toolbar = {
-  atsActiveBg:     "bg-gray-900",
-  atsActiveText:   "text-white",
-  atsInactiveBg:   "bg-gray-100",
-  atsInactiveText: "text-gray-600",
+  atsActiveBg:     "bg-[#e4e4e4]",
+  atsActiveText:   "text-[#0f0f0f]",
+  atsInactiveBg:   "bg-[#1e1e1e]",
+  atsInactiveText: "text-[#808080]",
 } as const;
