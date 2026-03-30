@@ -92,33 +92,100 @@ export default function StylePanel({ selected, iframeRef, onClose, setFocusLineA
     onClose();
   }
 
-  const inputClass = `w-full text-[12px] px-2 py-1.5 border ${shell.border} rounded bg-white ${shell.text} outline-none focus:border-blue-400`;
+  const inputCls = `w-full text-[12px] px-2.5 py-2 border ${shell.border} rounded-lg ${shell.bgMuted} ${shell.text} outline-none focus:border-[#404040] transition-colors`;
 
   return (
-    <div className={`w-[220px] shrink-0 flex flex-col border-l ${shell.border} ${shell.bgSubtle} overflow-y-auto`}>
-      <div className={`flex items-center justify-between px-3 py-2 border-b ${shell.border} shrink-0`}>
-        <span className={`text-[11px] font-semibold ${shell.textMuted}`}>Style</span>
-        <button onClick={onClose} className={`text-[13px] ${shell.textFaint} hover:text-gray-600 leading-none`}>✕</button>
+    <div className={`w-[228px] shrink-0 flex flex-col border-l ${shell.border} ${shell.bg} overflow-y-auto`}>
+      {/* Header */}
+      <div className={`flex items-center justify-between px-4 py-3 border-b ${shell.border} shrink-0`}>
+        <div className="flex items-center gap-2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" width="13" height="13" className={shell.textFaint}>
+            <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className={`text-[11px] font-semibold ${shell.textSecondary} tracking-wide`}>Inspector</span>
+        </div>
+        <button
+          onClick={onClose}
+          className={`w-5 h-5 flex items-center justify-center rounded ${shell.bgMuted} ${shell.textFaint} hover:bg-[#2a2a2a] hover:${shell.textMuted} transition-colors`}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="10" height="10">
+            <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
+          </svg>
+        </button>
       </div>
 
-      <div className="flex flex-col gap-3 px-3 py-3">
-        <div>
-          <label className={`block text-[10px] ${shell.textFaint} mb-1`}>Text</label>
-          <textarea value={text} onChange={(e) => { e.target.style.height = "auto"; e.target.style.height = e.target.scrollHeight + "px"; handleTextChange(e.target.value); }} ref={(el) => { if (el) { el.style.height = "auto"; el.style.height = el.scrollHeight + "px"; } }} className={`${inputClass} resize-none overflow-hidden`} rows={1} />
+      {/* Fields */}
+      <div className="flex flex-col gap-4 px-4 py-4">
+
+        {/* Text */}
+        <div className="flex flex-col gap-1.5">
+          <label className={`text-[10px] font-semibold uppercase tracking-widest ${shell.textFaint}`}>Text</label>
+          <textarea
+            value={text}
+            onChange={(e) => {
+              e.target.style.height = "auto";
+              e.target.style.height = e.target.scrollHeight + "px";
+              handleTextChange(e.target.value);
+            }}
+            ref={(el) => {
+              if (el) {
+                el.style.height = "auto";
+                el.style.height = el.scrollHeight + "px";
+              }
+            }}
+            className={`${inputCls} resize-none overflow-hidden leading-relaxed`}
+            rows={1}
+          />
         </div>
 
-        <div>
-          <label className={`block text-[10px] ${shell.textFaint} mb-1`}>Size (px)</label>
-          <input type="number" value={fontSize} min={STYLE_PANEL_FONT_SIZE_MIN} max={STYLE_PANEL_FONT_SIZE_MAX} onChange={(e) => handleFontSizeChange(e.target.value)} className={inputClass} />
+        {/* Font size */}
+        <div className="flex flex-col gap-1.5">
+          <label className={`text-[10px] font-semibold uppercase tracking-widest ${shell.textFaint}`}>Font Size</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="number"
+              value={fontSize}
+              min={STYLE_PANEL_FONT_SIZE_MIN}
+              max={STYLE_PANEL_FONT_SIZE_MAX}
+              onChange={(e) => handleFontSizeChange(e.target.value)}
+              className={`${inputCls} w-20`}
+            />
+            <span className={`text-[11px] ${shell.textFaint}`}>px</span>
+          </div>
         </div>
 
-        <div>
-          <label className={`block text-[10px] ${shell.textFaint} mb-1`}>Color</label>
-          <input type="color" value={color} onChange={(e) => handleColorChange(e.target.value)} className="w-full h-8 rounded border border-gray-200 cursor-pointer" />
+        {/* Color */}
+        <div className="flex flex-col gap-1.5">
+          <label className={`text-[10px] font-semibold uppercase tracking-widest ${shell.textFaint}`}>Color</label>
+          <div className="flex items-center gap-2.5">
+            <div className="relative w-9 h-9 shrink-0 rounded-lg overflow-hidden border border-[#353535]">
+              <input
+                type="color"
+                value={color}
+                onChange={(e) => handleColorChange(e.target.value)}
+                className="absolute -inset-1 w-[calc(100%+8px)] h-[calc(100%+8px)] cursor-pointer opacity-0"
+              />
+              <div className="w-full h-full rounded-lg" style={{ backgroundColor: color }} />
+            </div>
+            <input
+              type="text"
+              value={color}
+              onChange={(e) => handleColorChange(e.target.value)}
+              className={`${inputCls} flex-1 font-mono text-[11px] uppercase`}
+              maxLength={7}
+            />
+          </div>
         </div>
 
-        <button onClick={handleGoToCode} className="mt-1 text-[11px] text-blue-500 hover:text-blue-600 text-left">
-          ↗ Go to code
+        {/* Go to code */}
+        <button
+          onClick={handleGoToCode}
+          className={`flex items-center gap-1.5 text-[11px] ${shell.textFaint} hover:text-[#a0a0a0] transition-colors mt-1`}
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="12" height="12">
+            <path d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Go to code
         </button>
       </div>
     </div>
