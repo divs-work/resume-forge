@@ -1,5 +1,5 @@
 # ResumeForge
-#### update : CI / CD 
+#### update : Domain change
 
 ATS-friendly resume builder with LaTeX, Markdown, and HTML+Tailwind editors — runs entirely in the browser, persists to localStorage.
 
