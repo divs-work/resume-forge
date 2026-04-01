@@ -14,17 +14,17 @@ import StatusBar from "./StatusBar";
 
 const SIDE_PANEL_TITLES: Record<SidePanel, string> = {
   templates: "Templates",
-  ats:       "ATS Score",
-  help:      "Reference",
+  ats: "ATS Score",
+  help: "Reference",
 };
 
 export default function ResumeBuilder() {
-  const [sidePanel,  setSidePanel]  = useState<SidePanel | null>(null);
-  const [exporting,  setExporting]  = useState(false);
-  const [focusLine,  setFocusLine]  = useState<number | null>(null);
+  const [sidePanel, setSidePanel] = useState<SidePanel | null>(null);
+  const [exporting, setExporting] = useState(false);
+  const [focusLine, setFocusLine] = useState<number | null>(null);
   const [selectedEl, setSelectedEl] = useState<SelectedEl | null>(null);
-  const [pageCount,  setPageCount]  = useState(1);
-  const [scale,      setScale]      = useState(0.7);
+  const [pageCount, setPageCount] = useState(1);
+  const [scale, setScale] = useState(0.7);
   const [mobileView, setMobileView] = useState<"editor" | "preview">("editor");
 
   const resetTemplate = useResumeStore((s) => s.resetTemplate);
@@ -36,7 +36,7 @@ export default function ResumeBuilder() {
 
   const handleToggleSidePanel = useCallback((panel: SidePanel) => {
     setSelectedEl(null);
-    setSidePanel((cur) => cur === panel ? null : panel);
+    setSidePanel((cur) => (cur === panel ? null : panel));
   }, []);
 
   const handleOpenStylePanel = useCallback((el: SelectedEl) => {
@@ -61,7 +61,10 @@ export default function ResumeBuilder() {
         <ActivityBar
           active={sidePanel}
           onToggle={handleToggleSidePanel}
-          onReset={() => { closeAll(); resetTemplate(); }}
+          onReset={() => {
+            closeAll();
+            resetTemplate();
+          }}
         />
 
         {/* Mobile backdrop */}
@@ -74,9 +77,10 @@ export default function ResumeBuilder() {
 
         {/* Side panel */}
         {sidePanel && (
-          <div className="
+          <div
+            className="
             fixed lg:relative
-            top-12 lg:top-auto bottom-7 lg:bottom-auto
+            top-12 lg:top-auto bottom-0 lg:bottom-auto
             left-0 lg:left-auto
             w-[288px] z-50 lg:z-auto
             flex flex-col
@@ -85,7 +89,8 @@ export default function ResumeBuilder() {
             shadow-[2px_0_8px_rgba(0,0,0,0.06)] lg:shadow-none
             overflow-hidden
             animate-slide-in-left
-          ">
+          "
+          >
             {/* Panel header */}
             <div className="flex items-center justify-between px-4 py-3 border-b border-[#E0E0E0] shrink-0">
               <div className="flex items-center gap-2">
@@ -96,9 +101,16 @@ export default function ResumeBuilder() {
               </div>
               <button
                 onClick={() => setSidePanel(null)}
-                className="w-6 h-6 flex items-center justify-center rounded-full bg-black/[0.04] text-[#9E9E9E] hover:bg-black/[0.08] hover:text-[#616161] transition-all duration-150"
+                className="w-6 h-6 flex items-center justify-center rounded-full bg-black/4 text-[#9E9E9E] hover:bg-black/8 hover:text-[#616161] transition-all duration-150"
               >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="10" height="10">
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  width="10"
+                  height="10"
+                >
                   <path d="M18 6L6 18M6 6l12 12" strokeLinecap="round" />
                 </svg>
               </button>
@@ -107,14 +119,18 @@ export default function ResumeBuilder() {
             {/* Panel content */}
             <div className="flex-1 overflow-y-auto">
               {sidePanel === "templates" && <TemplatesPanel />}
-              {sidePanel === "ats"       && <ATSPanel />}
-              {sidePanel === "help"      && <HelpPanel />}
+              {sidePanel === "ats" && <ATSPanel />}
+              {sidePanel === "help" && <HelpPanel />}
             </div>
           </div>
         )}
 
         {/* Editor */}
-        <div className={`${mobileView === "editor" ? "flex" : "hidden lg:flex"} flex-col flex-1 min-w-0`}>
+        <div
+          className={`${
+            mobileView === "editor" ? "flex" : "hidden lg:flex"
+          } flex-col flex-1 min-w-0`}
+        >
           <EditorPane
             focusLine={focusLine}
             onFocusLineHandledAction={() => setFocusLine(null)}
@@ -123,7 +139,11 @@ export default function ResumeBuilder() {
         </div>
 
         {/* Preview */}
-        <div className={`${mobileView === "preview" ? "flex" : "hidden lg:flex"} flex-1 min-w-0`}>
+        <div
+          className={`${
+            mobileView === "preview" ? "flex" : "hidden lg:flex"
+          } flex-1 min-w-0`}
+        >
           <PreviewPane
             exporting={exporting}
             onExportDoneAction={setExporting}
