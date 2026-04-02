@@ -2,12 +2,10 @@ services:
   app:
     build: .
     restart: unless-stopped
-    expose:
-      - "${APP_PORT}"
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
     environment:
       PORT: ${APP_PORT}
-    networks:
-      - internal
     healthcheck:
       test:
         [
@@ -20,29 +18,3 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
-
-  nginx:
-    image: jonasal/nginx-certbot:latest
-    restart: unless-stopped
-    environment:
-      CERTBOT_EMAIL: ${CERTBOT_EMAIL}
-      DOMAIN: ${DOMAIN}
-      APP_PORT: ${APP_PORT}
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./nginx/app.conf:/etc/nginx/user_conf.d/app.conf:ro
-      - letsencrypt:/etc/letsencrypt
-    depends_on:
-      app:
-        condition: service_healthy
-    networks:
-      - internal
-
-volumes:
-  letsencrypt: # certs persisted across restarts / redeploys
-
-networks:
-  internal:
-    driver: bridge

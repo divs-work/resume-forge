@@ -80,9 +80,9 @@ export default function ResumeBuilder() {
           <div
             className="
             fixed lg:relative
-            top-12 lg:top-auto bottom-0 lg:bottom-auto
+            top-[88px] sm:top-12 lg:top-auto bottom-0 lg:bottom-auto
             left-0 lg:left-auto
-            w-[288px] z-50 lg:z-auto
+            w-full sm:w-[288px] z-50 lg:z-auto
             flex flex-col
             border-r border-[#E0E0E0]
             bg-white
