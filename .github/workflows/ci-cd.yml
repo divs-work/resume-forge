@@ -65,7 +65,6 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_KEY }}
-          envs: APP_PORT
           request_pty: true
           script: |
             # 1. Check if directory exists; clone if missing, pull if present
@@ -80,7 +79,9 @@ jobs:
             fi
 
             # 2. Write environment variables
-            printf 'APP_PORT=%s\n' "$APP_PORT" > .env
+            cat > .env <<EOF
+            APP_PORT=${{ secrets.APP_PORT }}
+            EOF
 
             # 3. Build and run Docker containers
             docker compose up --build -d --remove-orphans
