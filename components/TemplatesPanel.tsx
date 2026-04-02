@@ -1,18 +1,35 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useRef, useEffect, useState } from "react";
 import { useResumeStore } from "@/store/resumeStore";
 import { TEMPLATE_STYLES } from "@/constants/templates";
 import { buildResumeDocument } from "@/helper/documentBuilder";
 import { A4_WIDTH_PX, DEFAULT_TEMPLATE_LAYOUT } from "@/constants/config";
 import { shell, modeBg } from "@/constants/theme";
 
-const CARD_W   = 244;
-const SCALE    = CARD_W / A4_WIDTH_PX;
-const PREVIEW_H = 560;
-const CARD_H   = Math.round(PREVIEW_H * SCALE);
+const MAX_CARD_W = 244;
+const PREVIEW_H  = 560;
 
 export default function TemplatesPanel() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [cardW, setCardW] = useState(MAX_CARD_W);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const measure = () => {
+      const w = el.clientWidth - 24; // 12px padding each side
+      setCardW(Math.min(w > 0 ? w : MAX_CARD_W, MAX_CARD_W));
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const cardScale = cardW / A4_WIDTH_PX;
+  const cardH     = Math.round(PREVIEW_H * cardScale);
+
   const mode            = useResumeStore((s) => s.mode);
   const setContent      = useResumeStore((s) => s.setContent);
   const setMarkdownTheme = useResumeStore((s) => s.setMarkdownTheme);
@@ -37,7 +54,7 @@ export default function TemplatesPanel() {
   );
 
   return (
-    <div className="p-3 flex flex-col gap-2.5">
+    <div ref={containerRef} className="p-3 flex flex-col gap-2.5">
       {templates.map((tpl, i) => (
         <button
           key={tpl.id}
@@ -48,7 +65,7 @@ export default function TemplatesPanel() {
           {/* Preview */}
           <div
             className="relative overflow-hidden bg-white border-b border-[#e5e5e5]"
-            style={{ width: CARD_W, height: CARD_H }}
+            style={{ width: cardW, height: cardH }}
           >
             <iframe
               srcDoc={previewDocs[i]}
@@ -57,7 +74,7 @@ export default function TemplatesPanel() {
               style={{
                 width: A4_WIDTH_PX,
                 height: PREVIEW_H,
-                transform: `scale(${SCALE})`,
+                transform: `scale(${cardScale})`,
                 transformOrigin: "top left",
               }}
             />

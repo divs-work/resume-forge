@@ -95,7 +95,12 @@ export default function StylePanel({ selected, iframeRef, onClose, setFocusLineA
   const inputCls = `w-full text-[12px] px-2.5 py-2 border border-[#E0E0E0] rounded-xl bg-white ${shell.text} outline-none focus:border-[#1976D2]/60 transition-colors`;
 
   return (
-    <div className={`w-[228px] shrink-0 flex flex-col border-l ${shell.border} ${shell.bg} overflow-y-auto animate-slide-in-right`}>
+    <div className={`fixed inset-x-0 bottom-0 z-50 max-h-[60vh] rounded-t-2xl shadow-[0_-4px_20px_rgba(0,0,0,0.12)] sm:static sm:max-h-none sm:w-[228px] sm:shrink-0 sm:rounded-none sm:shadow-none flex flex-col border-t sm:border-t-0 sm:border-l ${shell.border} ${shell.bg} overflow-y-auto sm:animate-slide-in-right`}>
+      {/* Mobile drag handle */}
+      <div className="sm:hidden flex justify-center pt-2 pb-1 shrink-0">
+        <div className="w-8 h-1 rounded-full bg-black/20" />
+      </div>
+
       {/* Header */}
       <div className={`flex items-center justify-between px-4 py-3 border-b ${shell.border} shrink-0`}>
         <div className="flex items-center gap-2">
