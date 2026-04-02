@@ -72,7 +72,7 @@ jobs:
             # 1. Check if directory exists; clone if missing, pull if present
             if [ ! -d "~/resume-forge" ]; then
               echo "Repository not found. Cloning..."
-              git clone git@github.com:dx4956s/resume-forge.git ~/resume-forge
+              git clone git@github.com:${{ github.repository }}.git ~/resume-forge
               cd ~/resume-forge
             else
               echo "Repository found. Pulling latest changes..."
