@@ -59,9 +59,9 @@ jobs:
       - name: SSH → pull, build & restart
         uses: appleboy/ssh-action@v1
         with:
-          host: ${{ secrets.AWS_HOST }}
-          username: ${{ secrets.AWS_USER }}
-          key: ${{ secrets.AWS_SSH_KEY }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
           envs: APP_PORT
           request_pty: true
           script: |
