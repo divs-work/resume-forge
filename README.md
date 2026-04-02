@@ -1,5 +1,5 @@
 # ResumeForge
-#### update : Key Change
+#### update : AWS
 
 ATS-friendly resume builder with LaTeX, Markdown, and HTML+Tailwind editors — runs entirely in the browser, persists to localStorage.
 
