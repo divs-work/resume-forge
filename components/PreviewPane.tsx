@@ -11,8 +11,8 @@ import {
 } from "@/constants/config";
 import { buildResumeDocument } from "@/helper/documentBuilder";
 import { canvas } from "@/constants/theme";
-import StylePanel from "./StylePanel";
 import type { SelectedEl } from "@/types/resume";
+import StylePanel from "./StylePanel";
 
 export default function PreviewPane({
   exporting,
@@ -35,10 +35,26 @@ export default function PreviewPane({
 }) {
   const [scale, setScale] = useState(PREVIEW_INITIAL_SCALE);
   const [pageCount, setPageCount] = useState(1);
-  const [blobUrl, setBlobUrlAction] = useState<string | null>(null); // ← added
+  const [blobUrl, setBlobUrlAction] = useState<string | null>(null);
 
   const outerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  // ↓ Store latest actions in a ref to prevent listener teardowns
+  const actionsRef = useRef({
+    setSelectedElAction,
+    onCloseAllAction,
+    onPageCountChangeAction,
+  });
+
+  // Keep ref updated without triggering re-renders
+  useEffect(() => {
+    actionsRef.current = {
+      setSelectedElAction,
+      onCloseAllAction,
+      onPageCountChangeAction,
+    };
+  }, [setSelectedElAction, onCloseAllAction, onPageCountChangeAction]);
 
   const mode = useResumeStore((s) => s.mode);
   const content = useResumeStore((s) => s.content[s.mode]);
@@ -68,12 +84,11 @@ export default function PreviewPane({
     return buildResumeDocument(content, mode, undefined, fontId);
   }, [content, mode, markdownTheme, latexTheme, fontId, templateLayout]);
 
-  // ↓ Convert HTML string → Blob URL to escape parent page's CSP
   useEffect(() => {
     const blob = new Blob([docHTML], { type: "text/html" });
     const url = URL.createObjectURL(blob);
     setBlobUrlAction(url);
-    return () => URL.revokeObjectURL(url); // revoke previous URL on each update
+    return () => URL.revokeObjectURL(url);
   }, [docHTML, resetKey]);
 
   const updateScale = useCallback(() => {
@@ -99,9 +114,15 @@ export default function PreviewPane({
     }
   }, [exporting, onExportDoneAction]);
 
+  // ↓ Bulletproof event listener (empty dependency array)
   useEffect(() => {
     function handleMessage(e: MessageEvent) {
       if (!e.data) return;
+
+      // Always pull the freshest functions from the ref
+      const { setSelectedElAction, onCloseAllAction, onPageCountChangeAction } =
+        actionsRef.current;
+
       if (e.data.type === "rf-click") {
         setSelectedElAction({
           elIdx: e.data.elIdx,
@@ -122,7 +143,7 @@ export default function PreviewPane({
     }
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [onCloseAllAction, setSelectedElAction, onPageCountChangeAction]);
+  }, []); // ← Important: Empty dependency array
 
   function handleClosePanel() {
     iframeRef.current?.contentWindow?.postMessage({ type: "rf-deselect" }, "*");
@@ -159,8 +180,9 @@ export default function PreviewPane({
             <iframe
               key={resetKey}
               ref={iframeRef}
-              src={blobUrl ?? "about:blank"} // ← was srcDoc={docHTML}
-              className="w-198.5 h-(--total-h) border-0 bg-transparent overflow-hidden transform-[scale(var(--scale))] origin-top-left absolute top-0 left-0"
+              src={blobUrl ?? "about:blank"}
+              /* ↓ Replaced w-198.5 and h-(--total-h) with bulletproof arbitrary values */
+              className="w-[794px] h-[var(--total-h)] border-0 bg-transparent overflow-hidden transform-[scale(var(--scale))] origin-top-left absolute top-0 left-0"
               sandbox="allow-scripts allow-modals allow-popups allow-same-origin"
               title="Resume Preview"
               tabIndex={-1}

@@ -1,0 +1,90 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  # ── Type check ────────────────────────────────────────────────────────────
+  type-check:
+    name: Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run type-check
+
+  # ── Lint ──────────────────────────────────────────────────────────────────
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run lint
+
+  # ── Build (smoke test) ────────────────────────────────────────────────────
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: [type-check, lint]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+
+  # ── Deploy to AWS (main only) ─────────────────────────────────────────────
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
+          request_pty: true
+          script: |
+            # 1. Check if directory exists; clone if missing, pull if present
+            if [ ! -d "~/resume-forge" ]; then
+              echo "Repository not found. Cloning..."
+              git clone git@github-resumeforge:${{ github.repository }}.git ~/resume-forge
+              cd ~/resume-forge
+            else
+              echo "Repository found. Pulling latest changes..."
+              cd ~/resume-forge
+              git pull origin main
+            fi
+
+            # 2. Write environment variables
+            cat > .env <<EOF
+            APP_PORT=${{ secrets.APP_PORT }}
+            EOF
+
+            # 3. Build and run Docker containers
+            docker compose up --build -d --remove-orphans
+
+            # 4. Clean up old images to save disk space
+            docker image prune -f
