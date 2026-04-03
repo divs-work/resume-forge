@@ -8,7 +8,6 @@ import {
   PREVIEW_INITIAL_SCALE,
   PREVIEW_CONTAINER_PADDING,
   PREVIEW_MIN_BODY_HEIGHT,
-  PREVIEW_POLL_MS,
 } from "@/constants/config";
 import { buildResumeDocument } from "@/helper/documentBuilder";
 import { canvas } from "@/constants/theme";
@@ -70,23 +69,6 @@ export default function PreviewPane({
   }, [updateScale]);
 
   useEffect(() => {
-    const poll = setInterval(() => {
-      try {
-        const body = iframeRef.current?.contentDocument?.body;
-        if (body) {
-          const h = body.scrollHeight;
-          if (h > PREVIEW_MIN_BODY_HEIGHT) {
-            const n = Math.ceil(Math.max(A4_HEIGHT_PX, h) / A4_HEIGHT_PX);
-            setPageCount(n);
-            onPageCountChangeAction(n);
-          }
-        }
-      } catch {}
-    }, PREVIEW_POLL_MS);
-    return () => clearInterval(poll);
-  }, [docHTML, onPageCountChangeAction]);
-
-  useEffect(() => {
     if (exporting) {
       iframeRef.current?.contentWindow?.print();
       onExportDoneAction(false);
@@ -107,10 +89,18 @@ export default function PreviewPane({
       if (e.data.type === "rf-close") {
         onCloseAllAction();
       }
+      if (e.data.type === "rf-height") {
+        const h = e.data.height as number;
+        if (h > PREVIEW_MIN_BODY_HEIGHT) {
+          const n = Math.ceil(Math.max(A4_HEIGHT_PX, h) / A4_HEIGHT_PX);
+          setPageCount(n);
+          onPageCountChangeAction(n);
+        }
+      }
     }
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [onCloseAllAction, setSelectedElAction]);
+  }, [onCloseAllAction, setSelectedElAction, onPageCountChangeAction]);
 
   function handleClosePanel() {
     iframeRef.current?.contentWindow?.postMessage({ type: "rf-deselect" }, "*");
@@ -142,7 +132,7 @@ export default function PreviewPane({
               ref={iframeRef}
               srcDoc={docHTML}
               className="w-198.5 h-(--total-h) border-0 bg-transparent overflow-hidden transform-[scale(var(--scale))] origin-top-left absolute top-0 left-0"
-              sandbox="allow-scripts allow-same-origin allow-modals allow-popups"
+              sandbox="allow-scripts allow-modals allow-popups"
               title="Resume Preview"
               tabIndex={-1}
             />

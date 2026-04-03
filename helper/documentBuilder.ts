@@ -105,6 +105,9 @@ const CLICK_HANDLER =
       `if(sel){sel.style.outline='';sel.style.outlineOffset='';sel=null;}` +
     `}` +
   `});` +
+  `function rfH(){window.parent.postMessage({type:'rf-height',height:document.body.scrollHeight},'*');}` +
+  `new ResizeObserver(rfH).observe(document.body);` +
+  `rfH();` +
   `})()`;
 
 const CLICK_SCRIPT = `<script>${CLICK_HANDLER}</` + `script>`;
