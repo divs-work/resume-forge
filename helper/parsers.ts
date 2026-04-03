@@ -4,21 +4,53 @@ import { Marked, Renderer, type Tokens } from "marked";
 import type { ResumeTheme } from "@/types/resume";
 
 /* ═══════════════════════ HTML SANITIZER ═══════════════════════ */
+// Created once, reused on every call
+const DOMPurify = createDOMPurify(window);
 
 export function sanitizeHTML(html: string): string {
-  const purify = createDOMPurify(window);
-  return purify.sanitize(html, {
+  return DOMPurify.sanitize(html, {
     ALLOWED_TAGS: [
-      "h1", "h2", "h3", "h4", "h5", "h6",
-      "p", "br", "hr",
-      "ul", "ol", "li",
-      "strong", "em", "b", "i",
-      "a", "span", "div", "section", "header",
-      "code", "pre",
-      "table", "thead", "tbody", "tr", "td", "th",
+      "h1",
+      "h2",
+      "h3",
+      "h4",
+      "h5",
+      "h6",
+      "p",
+      "br",
+      "hr",
+      "ul",
+      "ol",
+      "li",
+      "strong",
+      "em",
+      "b",
+      "i",
+      "a",
+      "span",
+      "div",
+      "section",
+      "header",
+      "code",
+      "pre",
+      "table",
+      "thead",
+      "tbody",
+      "tr",
+      "td",
+      "th",
     ],
-    ALLOWED_ATTR: ["href", "src", "alt", "style", "class", "id", "target"],
-    ALLOW_DATA_ATTR: true,
+    ALLOWED_ATTR: ["href", "src", "alt", "style", "class", "id"],
+    ALLOW_DATA_ATTR: false,
+    ADD_ATTR: ["data-rf-el"],
+    FORBID_ATTR: [
+      "onerror",
+      "onload",
+      "onmouseover",
+      "onfocus",
+      "onclick",
+      "onauxclick",
+    ],
   });
 }
 
@@ -29,26 +61,40 @@ export function parseMarkdown(md: string, theme: ResumeTheme): string {
 
   r.heading = function ({ tokens, depth }) {
     const key = `h${depth}` as keyof ResumeTheme;
-    return `<h${depth} class="${theme[key] || theme.h3}">${this.parser.parseInline(tokens)}</h${depth}>`;
+    return `<h${depth} class="${
+      theme[key] || theme.h3
+    }">${this.parser.parseInline(tokens)}</h${depth}>`;
   };
   r.paragraph = function ({ tokens }) {
     return `<p class="${theme.p}">${this.parser.parseInline(tokens)}</p>`;
   };
   r.list = function (token) {
     const body = token.items.map((item) => this.listitem(item)).join("");
-    return `<${token.ordered ? "ol" : "ul"} class="${token.ordered ? theme.ol : theme.ul}">${body}</${token.ordered ? "ol" : "ul"}>`;
+    return `<${token.ordered ? "ol" : "ul"} class="${
+      token.ordered ? theme.ol : theme.ul
+    }">${body}</${token.ordered ? "ol" : "ul"}>`;
   };
   r.listitem = function (token) {
-    return `<li class="${theme.li}">${this.parser.parseInline(token.tokens)}</li>`;
+    return `<li class="${theme.li}">${this.parser.parseInline(
+      token.tokens
+    )}</li>`;
   };
   r.table = function (token: Tokens.Table) {
     const headerContent = token.header
-      .map((cell) => `<th class="${theme.th}">${this.parser.parseInline(cell.tokens)}</th>`)
+      .map(
+        (cell) =>
+          `<th class="${theme.th}">${this.parser.parseInline(cell.tokens)}</th>`
+      )
       .join("");
     const bodyContent = token.rows
       .map((row) => {
         const rowCells = row
-          .map((cell) => `<td class="${theme.td}">${this.parser.parseInline(cell.tokens)}</td>`)
+          .map(
+            (cell) =>
+              `<td class="${theme.td}">${this.parser.parseInline(
+                cell.tokens
+              )}</td>`
+          )
           .join("");
         return `<tr class="${theme.tr}">${rowCells}</tr>`;
       })
@@ -56,14 +102,18 @@ export function parseMarkdown(md: string, theme: ResumeTheme): string {
     return `<table class="${theme.table}"><thead class="${theme.thead}"><tr>${headerContent}</tr></thead><tbody class="${theme.tbody}">${bodyContent}</tbody></table>`;
   };
   r.strong = function ({ tokens }) {
-    return `<strong class="${theme.strong}">${this.parser.parseInline(tokens)}</strong>`;
+    return `<strong class="${theme.strong}">${this.parser.parseInline(
+      tokens
+    )}</strong>`;
   };
   r.em = function ({ tokens }) {
     return `<em class="${theme.em}">${this.parser.parseInline(tokens)}</em>`;
   };
   r.hr = () => `<hr class="${theme.hr}"/>`;
   r.link = function ({ href, tokens }) {
-    return `<a href="${href}" class="${theme.a}">${this.parser.parseInline(tokens)}</a>`;
+    return `<a href="${href}" class="${theme.a}">${this.parser.parseInline(
+      tokens
+    )}</a>`;
   };
 
   const marked = new Marked({ renderer: r, gfm: true });
@@ -77,7 +127,9 @@ export function parseMarkdown(md: string, theme: ResumeTheme): string {
 
 export function parseLatex(tex: string, theme: ResumeTheme): string {
   try {
-    const bodyMatch = tex.match(/\\begin\{document\}([\s\S]*?)\\end\{document\}/);
+    const bodyMatch = tex.match(
+      /\\begin\{document\}([\s\S]*?)\\end\{document\}/
+    );
     let src = bodyMatch ? bodyMatch[1] : tex;
 
     src = src.replace(/^%[^\n]*/gm, "");
@@ -115,14 +167,14 @@ export function parseLatex(tex: string, theme: ResumeTheme): string {
       /\{((?:\\(?:Huge|huge|LARGE|Large|large|small|footnotesize|scriptsize|tiny|normalsize|bfseries|mdseries|itshape|upshape)\s*)+)((?:[^{}]|\\.)*?)\}/g,
       (_, cmds, content) => {
         const cls: string[] = [];
-        if      (/\\Huge/.test(cmds))                  cls.push("text-4xl");
-        else if (/\\huge/.test(cmds))                  cls.push("text-3xl");
-        else if (/\\LARGE/.test(cmds))                 cls.push("text-2xl");
-        else if (/\\Large/.test(cmds))                 cls.push("text-xl");
-        else if (/\\large/.test(cmds))                 cls.push("text-lg");
-        else if (/\\small|\\footnotesize/.test(cmds))  cls.push("text-sm");
-        if (/\\bfseries/.test(cmds))  cls.push("font-bold");
-        if (/\\itshape/.test(cmds))   cls.push("italic");
+        if (/\\Huge/.test(cmds)) cls.push("text-4xl");
+        else if (/\\huge/.test(cmds)) cls.push("text-3xl");
+        else if (/\\LARGE/.test(cmds)) cls.push("text-2xl");
+        else if (/\\Large/.test(cmds)) cls.push("text-xl");
+        else if (/\\large/.test(cmds)) cls.push("text-lg");
+        else if (/\\small|\\footnotesize/.test(cmds)) cls.push("text-sm");
+        if (/\\bfseries/.test(cmds)) cls.push("font-bold");
+        if (/\\itshape/.test(cmds)) cls.push("italic");
         const trimmed = content.trim();
         return cls.length
           ? `<span class="${cls.join(" ")}">${trimmed}</span>`
@@ -138,17 +190,26 @@ export function parseLatex(tex: string, theme: ResumeTheme): string {
     src = src.replace(
       /\\rjob\{([^}]*)\}\{([^}]*)\}\{([^}]*)\}/g,
       `<h3 class="${theme.h3}">$1 <span class="font-normal text-sm ml-2">$3</span></h3>` +
-      `<h4 class="${theme.h4}">$2</h4>`
+        `<h4 class="${theme.h4}">$2</h4>`
     );
 
     src = src
-      .replace(/\\textbf\{([^}]*)\}/g,              `<strong class="${theme.strong}">$1</strong>`)
-      .replace(/\\textit\{([^}]*)\}/g,              `<em class="${theme.em}">$1</em>`)
-      .replace(/\\emph\{([^}]*)\}/g,                `<em class="${theme.em}">$1</em>`)
-      .replace(/\\textsc\{([^}]*)\}/g,              `<span class="uppercase tracking-wider text-sm">$1</span>`)
-      .replace(/\\href\{([^}]*)\}\{([^}]*)\}/g,     `<a href="$1" class="${theme.a}">$2</a>`)
-      .replace(/\\url\{([^}]*)\}/g,                 `<a href="$1" class="${theme.a}">$1</a>`)
-      .replace(/\\rule\{[^}]*\}\{[^}]*\}/g,         `<hr class="${theme.hr}"/>`);
+      .replace(
+        /\\textbf\{([^}]*)\}/g,
+        `<strong class="${theme.strong}">$1</strong>`
+      )
+      .replace(/\\textit\{([^}]*)\}/g, `<em class="${theme.em}">$1</em>`)
+      .replace(/\\emph\{([^}]*)\}/g, `<em class="${theme.em}">$1</em>`)
+      .replace(
+        /\\textsc\{([^}]*)\}/g,
+        `<span class="uppercase tracking-wider text-sm">$1</span>`
+      )
+      .replace(
+        /\\href\{([^}]*)\}\{([^}]*)\}/g,
+        `<a href="$1" class="${theme.a}">$2</a>`
+      )
+      .replace(/\\url\{([^}]*)\}/g, `<a href="$1" class="${theme.a}">$1</a>`)
+      .replace(/\\rule\{[^}]*\}\{[^}]*\}/g, `<hr class="${theme.hr}"/>`);
 
     // tables must be converted before \\ → <br> so row separators still work
     src = src.replace(
@@ -170,19 +231,25 @@ export function parseLatex(tex: string, theme: ResumeTheme): string {
           return `<tr class="${theme.tr}">${cells.join("")}</tr>`;
         });
 
-        const thead = hasHeaderRow && htmlRows.length
-          ? `<thead class="${theme.thead}">${htmlRows[0]}</thead>`
-          : "";
+        const thead =
+          hasHeaderRow && htmlRows.length
+            ? `<thead class="${theme.thead}">${htmlRows[0]}</thead>`
+            : "";
         const tbodyRows = hasHeaderRow ? htmlRows.slice(1) : htmlRows;
-        return `<table class="${theme.table}">${thead}<tbody class="${theme.tbody}">${tbodyRows.join("")}</tbody></table>`;
+        return `<table class="${theme.table}">${thead}<tbody class="${
+          theme.tbody
+        }">${tbodyRows.join("")}</tbody></table>`;
       }
     );
 
     src = src
-      .replace(/\\begin\{itemize\}(?:\[[^\]]*\])?/g,   `<ul class="${theme.ul}">`)
-      .replace(/\\end\{itemize\}/g,                      "</ul>")
-      .replace(/\\begin\{enumerate\}(?:\[[^\]]*\])?/g,  `<ol class="${theme.ol}">`)
-      .replace(/\\end\{enumerate\}/g,                    "</ol>");
+      .replace(/\\begin\{itemize\}(?:\[[^\]]*\])?/g, `<ul class="${theme.ul}">`)
+      .replace(/\\end\{itemize\}/g, "</ul>")
+      .replace(
+        /\\begin\{enumerate\}(?:\[[^\]]*\])?/g,
+        `<ol class="${theme.ol}">`
+      )
+      .replace(/\\end\{enumerate\}/g, "</ol>");
     src = src.replace(
       /\\item\s+([\s\S]*?)(?=\\item|<\/[uo]l>)/g,
       `<li class="${theme.li}">$1</li>`
@@ -207,9 +274,13 @@ export function parseLatex(tex: string, theme: ResumeTheme): string {
     const html = src
       .split(/\n{2,}/)
       .map((block) => {
-        const trimmed = block.trim().replace(/\n/g, " ").replace(/\s{2,}/g, " ");
+        const trimmed = block
+          .trim()
+          .replace(/\n/g, " ")
+          .replace(/\s{2,}/g, " ");
         if (!trimmed) return "";
-        if (/^<(?:h[1-6]|ul|ol|div|hr|table|br|p)[\s>/]/.test(trimmed)) return trimmed;
+        if (/^<(?:h[1-6]|ul|ol|div|hr|table|br|p)[\s>/]/.test(trimmed))
+          return trimmed;
         return `<p class="${theme.p}">${trimmed}</p>`;
       })
       .filter(Boolean)
@@ -217,6 +288,8 @@ export function parseLatex(tex: string, theme: ResumeTheme): string {
 
     return sanitizeHTML(html);
   } catch {
-    return sanitizeHTML(`<div style="color:red;padding:1rem">LaTeX parse error</div>`);
+    return sanitizeHTML(
+      `<div style="color:red;padding:1rem">LaTeX parse error</div>`
+    );
   }
 }

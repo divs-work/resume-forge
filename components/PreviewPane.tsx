@@ -33,29 +33,53 @@ export default function PreviewPane({
   onScaleChangeAction: (s: number) => void;
   onPageCountChangeAction: (n: number) => void;
 }) {
-  const [scale,     setScale]     = useState(PREVIEW_INITIAL_SCALE);
+  const [scale, setScale] = useState(PREVIEW_INITIAL_SCALE);
   const [pageCount, setPageCount] = useState(1);
+  const [blobUrl, setBlobUrlAction] = useState<string | null>(null); // ← added
 
-  const outerRef  = useRef<HTMLDivElement>(null);
+  const outerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  const mode           = useResumeStore((s) => s.mode);
-  const content        = useResumeStore((s) => s.content[s.mode]);
-  const markdownTheme  = useResumeStore((s) => s.markdownTheme);
-  const latexTheme     = useResumeStore((s) => s.latexTheme);
+  const mode = useResumeStore((s) => s.mode);
+  const content = useResumeStore((s) => s.content[s.mode]);
+  const markdownTheme = useResumeStore((s) => s.markdownTheme);
+  const latexTheme = useResumeStore((s) => s.latexTheme);
   const templateLayout = useResumeStore((s) => s.templateLayout);
-  const fontId         = useResumeStore((s) => s.fontId);
-  const resetKey       = useResumeStore((s) => s.resetKey);
+  const fontId = useResumeStore((s) => s.fontId);
+  const resetKey = useResumeStore((s) => s.resetKey);
 
   const docHTML = useMemo(() => {
-    if (mode === "markdown") return buildResumeDocument(content, mode, markdownTheme, fontId, templateLayout);
-    if (mode === "latex")    return buildResumeDocument(content, mode, latexTheme, fontId, templateLayout);
+    if (mode === "markdown")
+      return buildResumeDocument(
+        content,
+        mode,
+        markdownTheme,
+        fontId,
+        templateLayout
+      );
+    if (mode === "latex")
+      return buildResumeDocument(
+        content,
+        mode,
+        latexTheme,
+        fontId,
+        templateLayout
+      );
     return buildResumeDocument(content, mode, undefined, fontId);
   }, [content, mode, markdownTheme, latexTheme, fontId, templateLayout]);
 
+  // ↓ Convert HTML string → Blob URL to escape parent page's CSP
+  useEffect(() => {
+    const blob = new Blob([docHTML], { type: "text/html" });
+    const url = URL.createObjectURL(blob);
+    setBlobUrlAction(url);
+    return () => URL.revokeObjectURL(url); // revoke previous URL on each update
+  }, [docHTML, resetKey]);
+
   const updateScale = useCallback(() => {
     if (!outerRef.current) return;
-    const s = (outerRef.current.clientWidth - PREVIEW_CONTAINER_PADDING) / A4_WIDTH_PX;
+    const s =
+      (outerRef.current.clientWidth - PREVIEW_CONTAINER_PADDING) / A4_WIDTH_PX;
     setScale(s);
     onScaleChangeAction(s);
   }, [onScaleChangeAction]);
@@ -86,9 +110,7 @@ export default function PreviewPane({
           computedFontSize: e.data.computed.fontSize,
         });
       }
-      if (e.data.type === "rf-close") {
-        onCloseAllAction();
-      }
+      if (e.data.type === "rf-close") onCloseAllAction();
       if (e.data.type === "rf-height") {
         const h = e.data.height as number;
         if (h > PREVIEW_MIN_BODY_HEIGHT) {
@@ -121,18 +143,25 @@ export default function PreviewPane({
         ref={outerRef}
         onClick={handleClosePanel}
         className={`flex-1 overflow-auto ${canvas.bg} min-w-0`}
-        style={{ "--scale": scale, "--total-h": `${totalPaperH}px` } as React.CSSProperties}
+        style={
+          {
+            "--scale": scale,
+            "--total-h": `${totalPaperH}px`,
+          } as React.CSSProperties
+        }
       >
         <div className="py-8 flex justify-center">
           <div className="relative shrink-0 overflow-hidden w-[calc(794px*var(--scale))] h-[calc(var(--total-h)*var(--scale))]">
-            <div className={`absolute inset-0 ${canvas.paperBg} rounded-sm ${canvas.paperShadow}`} />
+            <div
+              className={`absolute inset-0 ${canvas.paperBg} rounded-sm ${canvas.paperShadow}`}
+            />
 
             <iframe
               key={resetKey}
               ref={iframeRef}
-              srcDoc={docHTML}
+              src={blobUrl ?? "about:blank"} // ← was srcDoc={docHTML}
               className="w-198.5 h-(--total-h) border-0 bg-transparent overflow-hidden transform-[scale(var(--scale))] origin-top-left absolute top-0 left-0"
-              sandbox="allow-scripts allow-modals allow-popups"
+              sandbox="allow-scripts allow-modals allow-popups allow-same-origin"
               title="Resume Preview"
               tabIndex={-1}
             />
@@ -143,9 +172,15 @@ export default function PreviewPane({
                 style={{ "--y": `${y}px` } as React.CSSProperties}
                 className="absolute left-0 right-0 h-0 z-10 top-[calc(var(--y)*var(--scale))]"
               >
-                <div className={`w-full h-[calc(8px*var(--scale))] ${canvas.bg} -translate-y-1/2 relative`}>
-                  <div className={`absolute top-0 inset-x-0 h-0.75 ${canvas.breakShadowTop}`} />
-                  <div className={`absolute bottom-0 inset-x-0 h-0.75 ${canvas.breakShadowBottom}`} />
+                <div
+                  className={`w-full h-[calc(8px*var(--scale))] ${canvas.bg} -translate-y-1/2 relative`}
+                >
+                  <div
+                    className={`absolute top-0 inset-x-0 h-0.75 ${canvas.breakShadowTop}`}
+                  />
+                  <div
+                    className={`absolute bottom-0 inset-x-0 h-0.75 ${canvas.breakShadowBottom}`}
+                  />
                 </div>
                 <div
                   className={`absolute top-1/2 -translate-y-1/2 right-[calc(-36px*var(--scale))] text-[calc(9px*var(--scale))] ${canvas.pageLabel} whitespace-nowrap font-mono`}
