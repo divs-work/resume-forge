@@ -150,8 +150,8 @@ export function buildResumeDocument(
 <meta charset="UTF-8"/>
 <base target="_blank"/>
 <link href="${fontUrl}" rel="stylesheet"/>
-${tailwindScript}
 ${CLICK_SCRIPT}
+${tailwindScript}
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
