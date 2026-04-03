@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <base target="_blank" />
+    <link id="rf-font" rel="stylesheet" href="" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        background: #fff;
+        overflow-x: hidden;
+        overflow-y: visible;
+      }
+      body {
+        background: #fff;
+        margin: 0;
+        padding: 0;
+        color: #000;
+        font-size: 11pt;
+        overflow-x: hidden;
+        overflow-y: visible;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      a {
+        color: #1a5fb4;
+        text-decoration: none;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+      .page-break {
+        page-break-before: always;
+        break-before: page;
+      }
+      h2,
+      h3 {
+        page-break-after: avoid;
+        break-after: avoid;
+      }
+      ul,
+      ol {
+        page-break-inside: avoid;
+        break-inside: avoid;
+      }
+      @page {
+        size: A4;
+        margin: 0;
+      }
+      @media print {
+        html,
+        body {
+          width: 210mm;
+          margin: 0;
+          padding: 0;
+          background: #fff;
+          overflow-x: hidden;
+          overflow-y: visible;
+        }
+        a {
+          color: inherit !important;
+        }
+        * {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+          outline: none !important;
+          max-width: 100%;
+        }
+      }
+    </style>
+    <style id="rf-dynamic"></style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      (function () {
+        var T = {
+          p: 1,
+          h1: 1,
+          h2: 1,
+          h3: 1,
+          h4: 1,
+          h5: 1,
+          h6: 1,
+          li: 1,
+          td: 1,
+          th: 1,
+          span: 1,
+          a: 1,
+          strong: 1,
+          em: 1,
+          b: 1,
+          i: 1,
+        };
+        var sel = null;
+        var ro = null;
+
+        function sendHeight() {
+          window.parent.postMessage(
+            { type: "rf-height", height: document.body.scrollHeight },
+            "*"
+          );
+        }
+
+        function applyContent(data) {
+          if (data.fontUrl) {
+            document.getElementById("rf-font").href = data.fontUrl;
+          }
+          if (data.styleCSS !== undefined) {
+            document.getElementById("rf-dynamic").textContent = data.styleCSS;
+          }
+          if (data.bodyHTML !== undefined) {
+            document.body.innerHTML = data.bodyHTML;
+            if (ro) ro.disconnect();
+            ro = new ResizeObserver(sendHeight);
+            ro.observe(document.body);
+            sendHeight();
+          }
+        }
+
+        document.addEventListener("click", function (e) {
+          var el = e.target;
+          while (el && el.tagName !== "BODY") {
+            if (
+              el.hasAttribute &&
+              el.hasAttribute("data-rf-el") &&
+              T[el.tagName.toLowerCase()]
+            )
+              break;
+            el = el.parentElement;
+          }
+          if (!el || el.tagName === "BODY") {
+            if (sel) {
+              sel.style.outline = "";
+              sel.style.outlineOffset = "";
+              sel = null;
+            }
+            window.parent.postMessage({ type: "rf-close" }, "*");
+            return;
+          }
+          if (sel) {
+            sel.style.outline = "";
+            sel.style.outlineOffset = "";
+          }
+          sel = el;
+          el.style.outline = "2px solid #1976D2";
+          el.style.outlineOffset = "2px";
+          var cs = window.getComputedStyle(el);
+          window.parent.postMessage(
+            {
+              type: "rf-click",
+              elIdx: el.getAttribute("data-rf-el"),
+              tag: el.tagName.toLowerCase(),
+              text: (el.textContent || "").trim().slice(0, 500),
+              x: e.clientX,
+              y: e.clientY,
+              computed: { color: cs.color, fontSize: cs.fontSize },
+            },
+            "*"
+          );
+          e.preventDefault();
+        });
+
+        window.addEventListener("message", function (e) {
+          if (!e.data) return;
+          var d = e.data;
+          if (d.type === "rf-content") {
+            applyContent(d);
+            return;
+          }
+          if (d.type === "rf-style") {
+            var el = document.querySelector('[data-rf-el="' + d.elIdx + '"]');
+            if (!el) return;
+            if (d.styles.fontSize !== undefined)
+              el.style.fontSize = d.styles.fontSize;
+            if (d.styles.color !== undefined) el.style.color = d.styles.color;
+          }
+          if (d.type === "rf-text") {
+            var el = document.querySelector('[data-rf-el="' + d.elIdx + '"]');
+            if (el) el.textContent = d.text;
+          }
+          if (d.type === "rf-print") {
+            window.print();
+          }
+          if (d.type === "rf-deselect") {
+            if (sel) {
+              sel.style.outline = "";
+              sel.style.outlineOffset = "";
+              sel = null;
+            }
+          }
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+          ro = new ResizeObserver(sendHeight);
+          ro.observe(document.body);
+          window.parent.postMessage({ type: "rf-ready" }, "*");
+          sendHeight();
+        });
+      })();
+    </script>
+  </head>
+  <body></body>
+</html>

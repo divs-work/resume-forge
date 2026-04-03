@@ -9,7 +9,7 @@ import {
   PREVIEW_CONTAINER_PADDING,
   PREVIEW_MIN_BODY_HEIGHT,
 } from "@/constants/config";
-import { buildResumeDocument } from "@/helper/documentBuilder";
+import { buildResumePayload, type ResumePayload } from "@/helper/documentBuilder";
 import { canvas } from "@/constants/theme";
 import type { SelectedEl } from "@/types/resume";
 import StylePanel from "./StylePanel";
@@ -35,7 +35,6 @@ export default function PreviewPane({
 }) {
   const [scale, setScale] = useState(PREVIEW_INITIAL_SCALE);
   const [pageCount, setPageCount] = useState(1);
-  const [blobUrl, setBlobUrlAction] = useState<string | null>(null);
 
   const outerRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
@@ -47,7 +46,6 @@ export default function PreviewPane({
     onPageCountChangeAction,
   });
 
-  // Keep ref updated without triggering re-renders
   useEffect(() => {
     actionsRef.current = {
       setSelectedElAction,
@@ -62,35 +60,29 @@ export default function PreviewPane({
   const latexTheme = useResumeStore((s) => s.latexTheme);
   const templateLayout = useResumeStore((s) => s.templateLayout);
   const fontId = useResumeStore((s) => s.fontId);
-  const resetKey = useResumeStore((s) => s.resetKey);
 
-  const docHTML = useMemo(() => {
+  const payload = useMemo<ResumePayload>(() => {
     if (mode === "markdown")
-      return buildResumeDocument(
-        content,
-        mode,
-        markdownTheme,
-        fontId,
-        templateLayout
-      );
+      return buildResumePayload(content, mode, markdownTheme, fontId, templateLayout);
     if (mode === "latex")
-      return buildResumeDocument(
-        content,
-        mode,
-        latexTheme,
-        fontId,
-        templateLayout
-      );
-    return buildResumeDocument(content, mode, undefined, fontId);
+      return buildResumePayload(content, mode, latexTheme, fontId, templateLayout);
+    return buildResumePayload(content, mode, undefined, fontId);
   }, [content, mode, markdownTheme, latexTheme, fontId, templateLayout]);
 
+  // Track whether the iframe has signalled it's ready
+  const iframeReadyRef = useRef(false);
+  const payloadRef = useRef<ResumePayload>(payload);
+
+  // Send updated payload whenever it changes (if iframe is ready)
   useEffect(() => {
-    const blob = new Blob([docHTML], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setBlobUrlAction(url);
-    return () => URL.revokeObjectURL(url);
-  }, [docHTML, resetKey]);
+    payloadRef.current = payload;
+    if (iframeReadyRef.current) {
+      iframeRef.current?.contentWindow?.postMessage(
+        { type: "rf-content", ...payload },
+        "*"
+      );
+    }
+  }, [payload]);
 
   const updateScale = useCallback(() => {
     if (!outerRef.current) return;
@@ -110,7 +102,7 @@ export default function PreviewPane({
 
   useEffect(() => {
     if (exporting) {
-      iframeRef.current?.contentWindow?.print();
+      iframeRef.current?.contentWindow?.postMessage({ type: "rf-print" }, "*");
       onExportDoneAction(false);
     }
   }, [exporting, onExportDoneAction]);
@@ -120,10 +112,16 @@ export default function PreviewPane({
     function handleMessage(e: MessageEvent) {
       if (!e.data) return;
 
-      // Always pull the freshest functions from the ref
       const { setSelectedElAction, onCloseAllAction, onPageCountChangeAction } =
         actionsRef.current;
 
+      if (e.data.type === "rf-ready") {
+        iframeReadyRef.current = true;
+        iframeRef.current?.contentWindow?.postMessage(
+          { type: "rf-content", ...payloadRef.current },
+          "*"
+        );
+      }
       if (e.data.type === "rf-click") {
         setSelectedElAction({
           elIdx: e.data.elIdx,
@@ -179,14 +177,21 @@ export default function PreviewPane({
             />
 
             <iframe
-              key={resetKey}
               ref={iframeRef}
-              src={blobUrl ?? "about:blank"}
-              /* ↓ Replaced w-198.5 and h-(--total-h) with bulletproof arbitrary values */
+              src="/preview.html"
               className="w-[794px] h-[var(--total-h)] border-0 bg-transparent overflow-hidden transform-[scale(var(--scale))] origin-top-left absolute top-0 left-0"
-              sandbox="allow-scripts allow-modals allow-popups allow-same-origin"
+              sandbox="allow-scripts allow-modals allow-popups"
               title="Resume Preview"
               tabIndex={-1}
+              onLoad={() => {
+                // Also send on load in case rf-ready fired before our listener was ready
+                if (payloadRef.current) {
+                  iframeRef.current?.contentWindow?.postMessage(
+                    { type: "rf-content", ...payloadRef.current },
+                    "*"
+                  );
+                }
+              }}
             />
 
             {breakLines.map((y, i) => (
