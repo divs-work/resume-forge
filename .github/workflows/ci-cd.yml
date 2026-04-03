@@ -68,13 +68,13 @@ jobs:
           request_pty: true
           script: |
             # 1. Check if directory exists; clone if missing, pull if present
-            if [ ! -d "~/resume-forge" ]; then
+            if [ ! -d "$HOME/resume-forge" ]; then
               echo "Repository not found. Cloning..."
-              git clone git@github-resumeforge:${{ github.repository }}.git ~/resume-forge
-              cd ~/resume-forge
+              git clone git@github-resumeforge:${{ github.repository }}.git "$HOME/resume-forge"
+              cd "$HOME/resume-forge"
             else
               echo "Repository found. Pulling latest changes..."
-              cd ~/resume-forge
+              cd "$HOME/resume-forge"
               git pull origin main
             fi
 

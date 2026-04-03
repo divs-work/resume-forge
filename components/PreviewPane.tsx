@@ -87,6 +87,7 @@ export default function PreviewPane({
   useEffect(() => {
     const blob = new Blob([docHTML], { type: "text/html" });
     const url = URL.createObjectURL(blob);
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setBlobUrlAction(url);
     return () => URL.revokeObjectURL(url);
   }, [docHTML, resetKey]);

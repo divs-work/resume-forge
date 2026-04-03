@@ -5,15 +5,9 @@ services:
     ports:
       - "${APP_PORT}:${APP_PORT}"
     environment:
-      PORT: ${APP_PORT}
+      APP_PORT: ${APP_PORT}
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "require('http').get('http://localhost:${APP_PORT}/', r => process.exit(r.statusCode === 200 ? 0 : 1)).on('error', () => process.exit(1))",
-        ]
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://localhost:${APP_PORT}/"]
       interval: 30s
       timeout: 10s
       retries: 3
