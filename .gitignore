@@ -44,3 +44,4 @@ nginx/app.conf
 template.bak
 CODING_STYLE.md
 .claude
+.github/workflows
